@@ -39,13 +39,13 @@ instead, a token is defined by data accounts, not custom program code.
 
 Token program  contains all token logic, it owns all token-related state accounts, and it also defines and enforces: 
 
-transfer rules
+- transfer rules
 
-minting and destruction
+- minting and destruction
 
-authorization and freezing
+- authorization and freezing
 
-access control
+- access control
 
 
 2. Mint Account
@@ -72,6 +72,35 @@ Token accounts stores user balances, each token account contains:
 - delegate
 - state
 
+`user_wallet_address + token_mint_address => associated_token_account_address`  
+
+Why ATA?
+
+Regular Token accounts often faces problems: a user can create multiple accounts for the same token, it is difficult for external parties to know which acocunt to transfer to. ATA solves this problem: each(user wallet, mint) corresponds to a unique ATA, the address is a deterministic PDA, all applications on the network can derive the same address.(ATA just like Ethereum `mapping(address => unit256) balanceOf`) 
+
 ### Why Solana uses one program for all tokens
 
+Solana uses the same program (SPL Token Program) for all tokens because it adopts an architecture design of "stateless program, state in account". The specific state of the token (such as balance, minting authority, etc.) is placed in a separate account, while the common token logic is centralized in a highly auditable and reusable program. This reduces the cost of repeatedly deploying contracts, lowers security risks, and makes it easier to perform parallel execution at runtime, thereby improving overall performance and throughput.
+
 ### How Solana tracks user token balances
+
+Ethereum:
+
+- balance is stored internally within the token contract
+- query using `balanceOf(user)`
+
+Solana:
+
+- each user's balance is stored in an independent ATA
+- ATA address is derived from (wallet_address, mint_address)
+- directly read account data
+
+| Aspect             | Ethereum          | Solana         |
+| ------------------ | ----------------- | -------------- |
+| Balance Storage    | Contract mapping  | User ATA       |
+| Who pays storage   | Contract deployer | User           |
+| Lookup             | `balanceOf`       | Derive ATA     |
+| Parallel execution | Limited           | Fully parallel |
+
+
+This design allows Solana to maintain high through even under high concurrency.
