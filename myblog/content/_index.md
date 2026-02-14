@@ -1,7 +1,4 @@
 +++
-title = "List of blog posts"
-sort_by = "date"
-template = "blog.html"
-page_template = "blog-page.html"
-paginate_by = 5
+title = "LiquidWeb"
+template = "index.html"
 +++

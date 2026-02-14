@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}
+{% if page.title %}{{ page.title }} | {% endif %}{% if config.title != "" %}{{ config.title }}{% else %}LiquidWeb{% endif %}
+{% endblock title %}
+
+{% block description %}
+{{ page.content | striptags | truncate(length=140) }}
+{% endblock description %}
+
+{% block content %}
+<article class="article-shell">
+  <a class="back-link" href="{{ get_url(path='@/blog/_index.md') }}">返回文章列表</a>
+
+  <header class="article-header">
+    <p class="article-meta">
+      {% if page.date %}{{ page.date }}{% else %}未标注日期{% endif %}
+      {% if page.reading_time %}
+        <span>{{ page.reading_time }} 分钟阅读</span>
+      {% endif %}
+    </p>
+    <h1>{% if page.title %}{{ page.title }}{% else %}未命名文章{% endif %}</h1>
+  </header>
+
+  <div class="article-content">
+    {{ page.content | safe }}
+  </div>
+</article>
+{% endblock content %}

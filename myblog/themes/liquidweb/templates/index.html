@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% set blog_section = get_section(path="blog/_index.md") %}
+
+<section class="hero-section">
+  <div class="hero-logo" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none">
+      <path d="M13 2.8V10h6.3L11 21.2V14H4.7L13 2.8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path>
+    </svg>
+  </div>
+  <h1 class="hero-title">{% if config.title != "" %}{{ config.title }}{% else %}LiquidWeb{% endif %}</h1>
+  <p class="hero-subtitle">{% if config.description != "" %}{{ config.description }}{% else %}现代 Web 设计工作室{% endif %}</p>
+
+  <div class="hero-actions">
+    <a class="glass-icon-btn" href="{{ get_url(path='@/blog/_index.md') }}" aria-label="查看文章">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M19 21V5a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v5m-4 0h4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+    </a>
+    <a class="glass-icon-btn" href="{{ get_url(path='@/blog/_index.md') }}" aria-label="博客列表">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M9.8 17 9 20l-1 1h8l-1-1-.8-3M3 13h18M5 17h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+    </a>
+    <a class="glass-icon-btn" href="#latest-posts" aria-label="最新文章">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M12 18h.01M8 21h8a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+    </a>
+  </div>
+</section>
+
+<section class="posts-section" id="latest-posts">
+  <div class="section-heading">
+    <h2>最新文章</h2>
+    <p><a class="post-link" href="{{ get_url(path='@/blog/_index.md') }}">查看全部</a></p>
+  </div>
+
+  {% if blog_section.pages | length > 0 %}
+    <div class="post-grid">
+      {% for page in blog_section.pages %}
+        <article class="post-card">
+          <p class="post-meta">
+            {% if page.date %}{{ page.date }}{% else %}未标注日期{% endif %}
+            {% if page.reading_time %}
+              <span>{{ page.reading_time }} 分钟阅读</span>
+            {% endif %}
+          </p>
+          <h3>
+            <a href="{{ page.permalink | safe }}">
+              {% if page.title %}{{ page.title }}{% else %}{{ page.slug }}{% endif %}
+            </a>
+          </h3>
+          <p>{{ page.content | striptags | truncate(length=140) }}</p>
+          <a class="post-link" href="{{ page.permalink | safe }}">阅读文章</a>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <p>还没有文章内容，可以先在 <code>content/blog/</code> 下新增一篇 Markdown。</p>
+    </div>
+  {% endif %}
+</section>
+{% endblock content %}
