@@ -2,8 +2,8 @@
 base_url = "https://mywebsite.com"
 
 # The site title and description; used in feeds by default.
-title = "LiquidWeb"
-description = "现代 Web 设计工作室"
+title = "厶月"
+description = "spn、mouzi"
 
 # The default language; used in feeds.
 default_language = "zh"

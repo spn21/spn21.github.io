@@ -1,4 +1,4 @@
 +++
-title = "My first post"
-date = 2026-2-12
+title = "account in solana"
+date = 2026-02-12
 +++
