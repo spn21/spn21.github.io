@@ -40,6 +40,11 @@
       <div class="post-grid">
         {% for page in paginator.pages %}
           <article class="post-card">
+            {% if page.extra.cover_image is defined and page.extra.cover_image != "" %}
+              <a class="post-cover-link" href="{{ page.permalink | safe }}" aria-label="查看 {{ page.title }}">
+                <img class="post-cover" src="{{ page.extra.cover_image }}" alt="{% if page.title %}{{ page.title }}{% else %}文章封面{% endif %}">
+              </a>
+            {% endif %}
             <p class="post-meta">
               {% if page.date %}{{ page.date }}{% else %}未标注日期{% endif %}
               {% if page.reading_time %}
@@ -62,6 +67,11 @@
         <div class="post-grid">
           {% for page in blog_section.pages %}
             <article class="post-card">
+              {% if page.extra.cover_image is defined and page.extra.cover_image != "" %}
+                <a class="post-cover-link" href="{{ page.permalink | safe }}" aria-label="查看 {{ page.title }}">
+                  <img class="post-cover" src="{{ page.extra.cover_image }}" alt="{% if page.title %}{{ page.title }}{% else %}文章封面{% endif %}">
+                </a>
+              {% endif %}
               <p class="post-meta">
                 {% if page.date %}{{ page.date }}{% else %}未标注日期{% endif %}
                 {% if page.reading_time %}
@@ -89,6 +99,11 @@
       <div class="post-grid">
         {% for page in section.pages %}
           <article class="post-card">
+            {% if page.extra.cover_image is defined and page.extra.cover_image != "" %}
+              <a class="post-cover-link" href="{{ page.permalink | safe }}" aria-label="查看 {{ page.title }}">
+                <img class="post-cover" src="{{ page.extra.cover_image }}" alt="{% if page.title %}{{ page.title }}{% else %}文章封面{% endif %}">
+              </a>
+            {% endif %}
             <p class="post-meta">
               {% if page.date %}{{ page.date }}{% else %}未标注日期{% endif %}
               {% if page.reading_time %}

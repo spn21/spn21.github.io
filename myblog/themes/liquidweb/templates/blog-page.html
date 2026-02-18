@@ -12,6 +12,12 @@
 <article class="article-shell">
   <a class="back-link" href="{{ get_url(path='@/blog/_index.md') }}">返回文章列表</a>
 
+  {% if page.extra.cover_image is defined and page.extra.cover_image != "" %}
+    <figure class="article-cover-wrap">
+      <img class="article-cover" src="{{ page.extra.cover_image }}" alt="{% if page.title %}{{ page.title }}{% else %}文章封面{% endif %}">
+    </figure>
+  {% endif %}
+
   <header class="article-header">
     <p class="article-meta">
       {% if page.date %}{{ page.date }}{% else %}未标注日期{% endif %}

@@ -1,6 +1,9 @@
 +++
 title = "Token in Solana"
 date = 2025-11-28
+
+[extra]
+cover_image = "/covers/second-cover.svg"
 +++
 
 

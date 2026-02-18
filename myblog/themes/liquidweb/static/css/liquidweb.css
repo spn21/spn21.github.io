@@ -283,6 +283,20 @@ a {
   box-shadow: 0 16px 30px rgba(15, 23, 42, 0.18);
 }
 
+.post-cover-link {
+  display: block;
+  margin: -0.4rem -0.4rem 0.72rem;
+}
+
+.post-cover {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 0.95rem;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.66);
+  background: rgba(255, 255, 255, 0.5);
+}
+
 .post-meta {
   margin: 0;
   display: flex;
@@ -391,6 +405,19 @@ a {
   color: #334155;
   font-weight: 600;
   margin-bottom: 1rem;
+}
+
+.article-cover-wrap {
+  margin: 0 0 1rem;
+}
+
+.article-cover {
+  width: 100%;
+  aspect-ratio: 21 / 9;
+  object-fit: cover;
+  border-radius: 1rem;
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-soft);
 }
 
 .article-header h1 {

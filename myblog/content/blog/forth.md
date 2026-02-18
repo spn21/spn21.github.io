@@ -1,6 +1,9 @@
 +++
 title = "account in solana"
 date = 2026-02-12
+
+[extra]
+cover_image = "/covers/forth-cover.svg"
 +++
 
 ---
