@@ -3,7 +3,7 @@ title = "非 EVM 智能合约漏洞检测：Prompt 与 Fine-Tuning 对比"
 date = 2026-02-14
 
 [extra]
-cover_image = "/covers/third-cover.svg"
+cover_image = "/covers/third.png"
 +++
 
 核心方向：过去十年，Ethereum / Solidity 几乎定义了智能合约安全研究的全部语境：

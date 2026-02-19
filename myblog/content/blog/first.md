@@ -1,9 +1,9 @@
 +++
 title = "My first post"
-date = 2019-11-27
+date = 2025-01-01
 
 [extra]
-cover_image = "/covers/first-cover.svg"
+cover_image = "/covers/first.jpg"
 +++
 
-This is my first blog post.m
+Hello World!
