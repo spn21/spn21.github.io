@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>
+account in solana | 厶月
+</title>
+  <meta name="description" content="
+
+title: accounts and storage in Solana
+author: spn
+pubDatetime: 2025-12-15
+slug:
+featured: false
+draft: false
+tags:
+
+solana
+anchor
+web3
+rust…
+">
+  <link rel="stylesheet" href="https://mywebsite.com/css/liquidweb.css">
+</head>
+<body>
+  <div class="liquid-bg" aria-hidden="true">
+    <div class="liquid-overlay"></div>
+    <div class="liquid-glow liquid-glow-a"></div>
+    <div class="liquid-glow liquid-glow-b"></div>
+  </div>
+
+  <div class="site-shell">
+    <header class="site-header">
+      <a class="brand" href="https://mywebsite.com/">
+        <span class="brand-logo" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M13 2.8V10h6.3L11 21.2V14H4.7L13 2.8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path>
+          </svg>
+        </span>
+        <span class="brand-copy">
+          <strong>厶月</strong>
+          <small>spn、mouzi</small>
+        </span>
+      </a>
+      <nav class="site-nav">
+        <a href="https://mywebsite.com/">首页</a>
+        <a href="https://mywebsite.com/blog/">文章</a>
+        <a href="https://mywebsite.com/about/">关于</a>
+      </nav>
+    </header>
+
+    <main class="site-main">
+      
+<article class="article-shell">
+  <a class="back-link" href="https://mywebsite.com/blog/">返回文章列表</a>
+
+  
+    <figure class="article-cover-wrap">
+      <img class="article-cover" src="&#x2F;covers&#x2F;forth.jpeg" alt="account in solana">
+    </figure>
+  
+
+  <header class="article-header">
+    <p class="article-meta">
+      2026-02-12
+      
+        <span>9 分钟阅读</span>
+      
+    </p>
+    <h1>account in solana</h1>
+  </header>
+
+  <div class="article-content">
+    <hr />
+<p>title: accounts and storage in Solana
+author: spn
+pubDatetime: 2025-12-15
+slug:
+featured: false
+draft: false
+tags:</p>
+<ul>
+<li>solana</li>
+<li>anchor</li>
+<li>web3</li>
+<li>rust
+description: accounts in Solana</li>
+</ul>
+<hr />
+<h2 id="0x01">0x01</h2>
+<p>In Solidity and Ethereum, SSTORE2 or SSTORE3 can store data in another smart contract, but in Solana, if we are the original deployer and the Solana program is not marked as immutable, we can update the bytecode at any time.</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="rust"><span class="giallo-l"><span style="color: #9399B2;">{</span></span>
+<span class="giallo-l"><span>    key</span><span style="color: #94E2D5;">:</span><span> 5JaQgKk2ggYYNHyyAyNSBCNPdeytNPAFhFoJHy1gwiNj</span></span>
+<span class="giallo-l"><span>    value</span><span style="color: #94E2D5;">:</span><span style="color: #9399B2;"> {</span></span>
+<span class="giallo-l"><span>        data</span><span style="color: #94E2D5;">: ...</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">    }</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">}</span></span></code></pre>
+<p>Solana's model is similar to Ethereum, a key-value store.(be up to 10MB)</p>
+<p>In Solana(anchor), all storage(account data), is treared as a struct when we try to read or write data, we should try to interpret these data. In anchor, it will derserialize and serialize account data into structs.So we need to initialize the Solana account before we can use it.</p>
+<p>address of initialized accounts in Solana depond on the program that owns the storage account, basic_storage (which is akin to the address of the deploying contract) and the seeds (which is akin to create2’s “salt”)</p>
+<p>note: in anchor, it silently converts rust snake case to typescript camel case.</p>
+<h2 id="0x02">0x02</h2>
+<p>In solana it has "rent", nowadays all accounts are required to be paid than 2 years of rent.</p>
+<p>And accounts with zero data are not free because Solana should create index and store metadata about them.</p>
+<p>We can use "solana rent <code>&lt;number of bytes&gt;</code> to calculate.</p>
+<p><a rel="external" href="https://www.reddit.com/r/solana/comments/qwin1h/my_sol_balance_in_the_wallet_is_decreasing/?rdt=33377">a funny post about solana rent</a></p>
+<h2 id="0x03">0x03</h2>
+<p>UncheckedAccount in anchor</p>
+<p>the type to tell anchor do not check the account when this account being read, and this program doesn't have <code>Context</code></p>
+<p><strong>"If a malicious user crafts an account the program did not create and then passes it to the Solana program, and the Solana program blindly trusts the data in the account, critical errors may occur."</strong></p>
+<p>for example:</p>
+<p>a bank contract struct:</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="rust"><span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">pub struct</span><span style="color: #F9E2AF;font-style: italic;"> BankAccount</span><span style="color: #9399B2;"> {</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">  pub</span><span> owner</span><span style="color: #94E2D5;">:</span><span style="color: #F9E2AF;font-style: italic;"> Pubkey</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">  pub</span><span> balance</span><span style="color: #94E2D5;">:</span><span style="color: #CBA6F7;"> u64</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #94E2D5;">...</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">pub fn</span><span style="color: #89B4FA;font-style: italic;"> withdraw</span><span style="color: #9399B2;">(</span></span>
+<span class="giallo-l"><span style="color: #EBA0AC;">  program_id</span><span style="color: #94E2D5;">: &amp;</span><span style="color: #F9E2AF;font-style: italic;">Pubkey</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #EBA0AC;">  accounts</span><span style="color: #94E2D5;">: &amp;</span><span style="color: #9399B2;">[</span><span style="color: #F9E2AF;font-style: italic;">AccountInfo</span><span style="color: #9399B2;">],</span></span>
+<span class="giallo-l"><span style="color: #EBA0AC;">  amount</span><span style="color: #94E2D5;">:</span><span style="color: #CBA6F7;"> u64</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">)</span><span style="color: #94E2D5;"> -&gt; -&gt;</span><span style="color: #F9E2AF;font-style: italic;"> ProgramResult</span><span style="color: #9399B2;"> {</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">    let</span><span> bank_account</span><span style="color: #94E2D5;"> = &amp;</span><span>accounts</span><span style="color: #9399B2;">[</span><span style="color: #FAB387;">0</span><span style="color: #9399B2;">];</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #9399B2;font-style: italic;">    // directly deserialize the data</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">    let mut</span><span> data</span><span style="color: #94E2D5;"> =</span><span> bank_account</span><span style="color: #94E2D5;">.</span><span style="color: #89B4FA;font-style: italic;">try_borrow_mut_data</span><span style="color: #9399B2;">()</span><span style="color: #94E2D5;">?</span><span style="color: #9399B2;">;</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">    let</span><span> bank_data</span><span style="color: #94E2D5;">: &amp;</span><span style="color: #CBA6F7;">mut</span><span style="color: #F9E2AF;font-style: italic;"> BankAccount</span><span style="color: #94E2D5;"> =</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">        unsafe</span><span style="color: #9399B2;"> {</span><span style="color: #94E2D5;"> &amp;</span><span style="color: #CBA6F7;">mut</span><span style="color: #94E2D5;"> *</span><span style="color: #9399B2;">(</span><span>data</span><span style="color: #94E2D5;">.</span><span style="color: #89B4FA;font-style: italic;">as_mut_ptr</span><span style="color: #9399B2;">()</span><span style="color: #CBA6F7;"> as</span><span style="color: #94E2D5;"> *</span><span style="color: #CBA6F7;">mut</span><span style="color: #F9E2AF;font-style: italic;"> BankAccount</span><span style="color: #9399B2;">) };</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #9399B2;font-style: italic;">    // trust the balance</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">    if</span><span> bank_data</span><span style="color: #94E2D5;">.</span><span>balance</span><span style="color: #94E2D5;"> &lt;</span><span> amount</span><span style="color: #9399B2;"> {</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">        return</span><span style="color: #F9E2AF;font-style: italic;"> Err</span><span style="color: #9399B2;">(</span><span style="color: #F9E2AF;font-style: italic;">ProgramError</span><span style="color: #94E2D5;">::</span><span style="color: #F9E2AF;font-style: italic;">InsufficientFunds</span><span style="color: #9399B2;">);</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    bank_data</span><span style="color: #94E2D5;">.</span><span>balance </span><span style="color: #94E2D5;">-=</span><span> amount</span><span style="color: #9399B2;">;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #F9E2AF;font-style: italic;">    Ok</span><span style="color: #9399B2;">(())</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">}</span></span></code></pre>
+<p>and we can create a fake account in another trade and write:</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="rust"><span class="giallo-l"><span>  owner</span><span style="color: #94E2D5;"> =</span><span> fake pubkey</span></span>
+<span class="giallo-l"><span>  balance</span><span style="color: #94E2D5;"> =</span><span style="color: #FAB387;"> 1_000_000_000</span></span></code></pre>
+<p>and send this account to withdraw:</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="rust"><span class="giallo-l"><span>  </span></span>
+<span class="giallo-l"><span style="color: #89B4FA;font-style: italic;">  withdraw</span><span style="color: #9399B2;">(</span></span>
+<span class="giallo-l"><span>    fake_bank_account</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span>    amount</span><span style="color: #94E2D5;"> =</span><span style="color: #FAB387;"> 100_000</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">  )</span></span>
+<span class="giallo-l"></span></code></pre>
+<p>the check will pass</p>
+<p>but in anchor context:</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="rust"><span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #F9E2AF;font-style: italic;">#</span><span style="color: #9399B2;">[</span><span style="color: #F9E2AF;font-style: italic;">derive</span><span style="color: #9399B2;">(</span><span style="color: #F9E2AF;font-style: italic;">Accounts</span><span style="color: #9399B2;">)]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">  pub struct</span><span style="color: #F9E2AF;font-style: italic;"> Withdraw</span><span style="color: #89DCEB;">&lt;</span><span style="color: #9399B2;">&#39;</span><span style="color: #89B4FA;font-style: italic;">info</span><span style="color: #89DCEB;">&gt;</span><span style="color: #9399B2;"> {</span></span>
+<span class="giallo-l"><span style="color: #F9E2AF;font-style: italic;">    #</span><span style="color: #9399B2;">[</span><span style="color: #F9E2AF;font-style: italic;">account</span><span style="color: #9399B2;">(</span><span style="color: #CBA6F7;">mut</span><span style="color: #9399B2;">)]</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">    pub</span><span> bank_account</span><span style="color: #94E2D5;">:</span><span style="color: #F9E2AF;font-style: italic;"> Account</span><span style="color: #89DCEB;">&lt;</span><span style="color: #9399B2;">&#39;</span><span style="color: #89B4FA;font-style: italic;">info</span><span style="color: #9399B2;">,</span><span style="color: #F9E2AF;font-style: italic;"> BankAccount</span><span style="color: #89DCEB;">&gt;</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">  }</span></span>
+<span class="giallo-l"></span></code></pre>
+<p>in anchor it will check <code>account owner</code> and account data(8-byte),and will check account size:</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="rust"><span class="giallo-l"><span>  </span></span>
+<span class="giallo-l"><span>  data</span><span style="color: #94E2D5;">.</span><span style="color: #89B4FA;font-style: italic;">len</span><span style="color: #9399B2;">()</span><span style="color: #94E2D5;"> ==</span><span style="color: #FAB387;"> 8</span><span style="color: #94E2D5;"> +</span><span style="color: #89B4FA;font-style: italic;"> size_of</span><span style="color: #94E2D5;">::</span><span style="color: #89DCEB;">&lt;</span><span style="color: #F9E2AF;font-style: italic;">BankAccount</span><span style="color: #89DCEB;">&gt;</span><span style="color: #9399B2;">()</span></span></code></pre>
+<p>so in anchor: <code>Account&lt;T&gt;</code> mandatory account soverrignty and structure verification.</p>
+<h2 id="0x04">0x04</h2>
+<p>Reentrancy attack in Solana:</p>
+<p>In Solana, reentrancy is not about repeatedly entering a function, but rather about "the utilization of the observability of intermediate states across the program."</p>
+<p>CPI logic reentrancy
+Cross-Program Invocation (CPI) is the inter-program invocation mechanism in Solana. It's used for system instruction calls, SPL token transfers, custom program execution, and even event emission, making it a core part of writing functional programs in Solana. Its permission model and invocation capabilities differ significantly from EVM.</p>
+<p>A simplified flowchat:</p>
+<p>User
+-&gt; call program A
+-&gt; CPI program B
+-&gt; CPI program A //reentrancy attack</p>
+<p>If program A updates status before CPI and continue depend on the status after CPI, it will be probably exploited.</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="rust"><span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">  pub fn</span><span style="color: #89B4FA;font-style: italic;"> withdraw</span><span style="color: #9399B2;">(</span><span style="color: #EBA0AC;">ctx</span><span style="color: #94E2D5;">:</span><span style="color: #F9E2AF;font-style: italic;"> Context</span><span style="color: #89DCEB;">&lt;</span><span style="color: #F9E2AF;font-style: italic;">Withdraw</span><span style="color: #89DCEB;">&gt;</span><span style="color: #9399B2;">,</span><span style="color: #EBA0AC;"> amount</span><span style="color: #94E2D5;">:</span><span style="color: #CBA6F7;"> u64</span><span style="color: #9399B2;">) {</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span style="color: #89B4FA;font-style: italic;">    require!</span><span style="color: #9399B2;">(</span><span>vault</span><span style="color: #94E2D5;">.</span><span>balance </span><span style="color: #94E2D5;">&gt;=</span><span> amount</span><span style="color: #9399B2;">);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #F9E2AF;">    token</span><span style="color: #94E2D5;">::</span><span style="color: #89B4FA;font-style: italic;">transfer</span><span style="color: #9399B2;">(</span><span style="color: #94E2D5;">...</span><span style="color: #9399B2;">)</span><span style="color: #94E2D5;">?</span><span style="color: #9399B2;">;</span><span style="color: #9399B2;font-style: italic;"> //CPI transfer</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    vault</span><span style="color: #94E2D5;">.</span><span>balance </span><span style="color: #94E2D5;">-=</span><span> amount</span><span style="color: #9399B2;">;</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">  }</span></span>
+<span class="giallo-l"></span></code></pre>
+<p>Read-only reentrancy
+When CPI callback. it does not modify account informaition, but it reads "intermediate" data.
+In Solana, we can not use reentrancy locks to defend read-only reentrancy beacause we can not stop others to read your account.</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="rust"><span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">pub fn</span><span style="color: #89B4FA;font-style: italic;"> price</span><span style="color: #9399B2;">(</span><span style="color: #EBA0AC;">ctx</span><span style="color: #94E2D5;">:</span><span style="color: #F9E2AF;font-style: italic;"> Context</span><span style="color: #89DCEB;">&lt;</span><span style="color: #F9E2AF;font-style: italic;">Price</span><span style="color: #89DCEB;">&gt;</span><span style="color: #9399B2;">)</span><span style="color: #94E2D5;"> -&gt;</span><span style="color: #CBA6F7;"> u64</span><span style="color: #9399B2;"> {</span></span>
+<span class="giallo-l"><span>  ctx</span><span style="color: #94E2D5;">.</span><span>accoounts</span><span style="color: #94E2D5;">.</span><span>pool</span><span style="color: #94E2D5;">.</span><span>virtual_price</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">}</span></span>
+<span class="giallo-l"></span></code></pre>
+<p>A simplified flowchat:</p>
+<p>program A: update_price()
+-&gt; CPI program B // B read A pool.virtual_price(intermediate data)</p>
+<h2 id="0x05">0x05</h2>
+<p>PDA(Program Derived Address)</p>
+<p>PDA is also an account created by address from the program and the seeds from the <code>init</code> transaction.</p>
+<p><code>PDA = (seeds + Program ID) derive</code></p>
+<p>seeds: static(eg."hello_world") or dynamic("user's public key")
+bump: a number between 0 and 255 to ensure that the gernerated PDA isn't on the Ed25519(so can't find the private key and sign it)</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="rust"><span class="giallo-l"><span style="color: #F9E2AF;font-style: italic;">#</span><span style="color: #9399B2;">[</span><span style="color: #F9E2AF;font-style: italic;">derive</span><span style="color: #9399B2;">(</span><span style="color: #F9E2AF;font-style: italic;">Accounts</span><span style="color: #9399B2;">)]</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">pub struct</span><span style="color: #F9E2AF;font-style: italic;"> InitializePDA</span><span style="color: #89DCEB;">&lt;</span><span style="color: #9399B2;">&#39;</span><span style="color: #89B4FA;font-style: italic;">info</span><span style="color: #89DCEB;">&gt;</span><span style="color: #9399B2;"> {</span><span> </span></span>
+<span class="giallo-l"><span style="color: #F9E2AF;font-style: italic;">  #</span><span style="color: #9399B2;">[</span><span style="color: #F9E2AF;font-style: italic;">account</span><span style="color: #9399B2;">(</span><span style="color: #F9E2AF;font-style: italic;">init</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #F9E2AF;font-style: italic;">            payer </span><span style="color: #94E2D5;">=</span><span style="color: #F9E2AF;font-style: italic;"> size_of</span><span style="color: #94E2D5;">::</span><span style="color: #89DCEB;">&lt;</span><span style="color: #F9E2AF;font-style: italic;">PDA</span><span style="color: #89DCEB;">&gt;</span><span style="color: #9399B2;">()</span><span style="color: #94E2D5;"> +</span><span style="color: #F9E2AF;font-style: italic;"> 8</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #F9E2AF;font-style: italic;">            seeds </span><span style="color: #94E2D5;">=</span><span style="color: #9399B2;"> [],</span></span>
+<span class="giallo-l"><span>            bump</span><span style="color: #9399B2;">)]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">  pub</span><span> pda</span><span style="color: #94E2D5;">:</span><span style="color: #F9E2AF;font-style: italic;"> Account</span><span style="color: #89DCEB;">&lt;</span><span style="color: #9399B2;">&#39;</span><span style="color: #89B4FA;font-style: italic;">info</span><span style="color: #9399B2;">,</span><span style="color: #F9E2AF;font-style: italic;"> PDA</span><span style="color: #89DCEB;">&gt;</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">}</span></span></code></pre>
+<p>usage: Deterministic Address Generation: Generates a unique and predictable account address for each user.</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="plain"><span class="giallo-l"><span>   Cross-Program Permissions: Allows one program to sign and operate accounts on behalf of another program.</span></span>
+<span class="giallo-l"><span>   </span></span>
+<span class="giallo-l"><span>   Data Association: Organizes related data together, such as user A&#39;s position data in project B.</span></span>
+<span class="giallo-l"><span>   </span></span>
+<span class="giallo-l"><span>   Eliminates Transaction Signatures: Users only need to authorize the program once; subsequent operations can be completed by the program via PDA.</span></span></code></pre>
+<p>Keypair Account</p>
+<p>no seeds and bump</p>
+<h2 id="0x06">0x06</h2>
+<p>Owner and Authority</p>
+<p>In solana, only programs can write data to accounts, and more specifically, a porgram can only write to accounts that it owns.
+account -&gt; owner is a program</p>
+<p>But program do not spontaneously modify accounts, they must be invoked via an instruction sent by a wallet.
+wallet -&gt; authority
+Most program will only accept write instructions if the transaction is signed by a privileged wallet, known as the authority.</p>
+<p>*** Only the owner of an account can modify the data in it ***</p>
+<p>···
+An authority is an address from which a program will accept instructions if it sees a valid signature. An authority cannot modify an account directly. It needs to work through a program that owns the account it is trying to modify.
+···</p>
+<p>When we start to learn solana and we use <code>solana account &lt;address&gt;</code>, we will notice something surprising:</p>
+<p>The owner is 11111111111111111111111111111111</p>
+<p>That address corresponds to the System Program.</p>
+<p>This is intentional.</p>
+<p>Only the owner of an account can modify its data.
+If wallets owned themselves, users could arbitrarily change balances.</p>
+<p>Instead:</p>
+<p>You sign a transaction</p>
+<p>The System Program verifies your signature</p>
+<p>The System Program updates the balance on your behalf</p>
+<h2 id="0x07">0x07</h2>
+<p><code>#[derive(Accounts)]</code> and account types</p>
+<p>In solana anchor, <code>#[derive(Accounts)]</code>is an attribute-like macro applied to a rust struct. This struct defines all accounts that an instruction may access during execution.</p>
+<p>Solana is parallel transaction execution so it is fast, if both Alice and Bob specify the same storage account, solana will infer a write conflict, and usually choose the one with higher priority fee, the other transacation will fail. This conflict detection is only possible because accounts are decalred up front.</p>
+<p>Each field represents an account the program intends to access during execution.(even though it may not always use all of them)</p>
+<p>The most commonly used account types are:</p>
+<p><em>Account</em>
+<em>UncheckedAccount / AccountInfo</em>
+<em>Signer</em>
+<em>Program</em></p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="rust"><span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">use</span><span style="color: #F9E2AF;"> anchor_lang</span><span style="color: #94E2D5;">::</span><span style="color: #F9E2AF;">prelude</span><span style="color: #94E2D5;">::*</span><span style="color: #9399B2;">;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #F9E2AF;font-style: italic;">  #</span><span style="color: #9399B2;">[</span><span style="color: #F9E2AF;font-style: italic;">derive</span><span style="color: #9399B2;">(</span><span style="color: #F9E2AF;font-style: italic;">Accounts</span><span style="color: #9399B2;">)]</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">  pub struct</span><span style="color: #F9E2AF;font-style: italic;"> Initialize</span><span style="color: #89DCEB;">&lt;</span><span style="color: #9399B2;">&#39;</span><span style="color: #89B4FA;font-style: italic;">info</span><span style="color: #89DCEB;">&gt;</span><span style="color: #9399B2;"> {</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #F9E2AF;font-style: italic;">    #</span><span style="color: #9399B2;">[</span><span style="color: #F9E2AF;font-style: italic;">account</span><span style="color: #9399B2;">(</span><span style="color: #F9E2AF;font-style: italic;">init</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #F9E2AF;font-style: italic;">              payer </span><span style="color: #94E2D5;">=</span><span style="color: #F9E2AF;font-style: italic;"> signer</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #F9E2AF;font-style: italic;">              space </span><span style="color: #94E2D5;">=</span><span style="color: #F9E2AF;font-style: italic;"> size_of</span><span style="color: #94E2D5;">::</span><span style="color: #89DCEB;">&lt;</span><span style="color: #F9E2AF;font-style: italic;">Mystorage</span><span style="color: #89DCEB;">&gt;</span><span style="color: #9399B2;">()</span><span style="color: #94E2D5;"> +</span><span style="color: #F9E2AF;font-style: italic;"> 8</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #F9E2AF;font-style: italic;">              seeds </span><span style="color: #94E2D5;">=</span><span style="color: #9399B2;"> [],</span></span>
+<span class="giallo-l"><span>              bump</span><span style="color: #9399B2;">)]</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">    pub</span><span> my_storage</span><span style="color: #94E2D5;">:</span><span style="color: #F9E2AF;font-style: italic;"> Account</span><span style="color: #89DCEB;">&lt;</span><span style="color: #9399B2;">&#39;</span><span style="color: #89B4FA;font-style: italic;">info</span><span style="color: #9399B2;">,</span><span style="color: #F9E2AF;font-style: italic;"> MyStorage</span><span style="color: #89DCEB;">&gt;</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #F9E2AF;font-style: italic;">    #</span><span style="color: #9399B2;">[</span><span style="color: #F9E2AF;font-style: italic;">account</span><span style="color: #9399B2;">(</span><span style="color: #CBA6F7;">mut</span><span style="color: #9399B2;">)]</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">    pub</span><span> signer</span><span style="color: #94E2D5;">:</span><span style="color: #F9E2AF;font-style: italic;"> Signer</span><span style="color: #89DCEB;">&lt;</span><span style="color: #9399B2;">&#39;</span><span style="color: #89B4FA;font-style: italic;">info</span><span style="color: #89DCEB;">&gt;</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">    pub</span><span> system_program</span><span style="color: #94E2D5;">:</span><span style="color: #F9E2AF;font-style: italic;"> Program</span><span style="color: #89DCEB;">&lt;</span><span style="color: #9399B2;">&#39;</span><span style="color: #89B4FA;font-style: italic;">info</span><span style="color: #9399B2;">,</span><span style="color: #F9E2AF;font-style: italic;"> System</span><span style="color: #89DCEB;">&gt;</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">  }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #F9E2AF;font-style: italic;"> #</span><span style="color: #9399B2;">[</span><span style="color: #F9E2AF;font-style: italic;">derive</span><span style="color: #9399B2;">(</span><span style="color: #F9E2AF;font-style: italic;">Accounts</span><span style="color: #9399B2;">)]</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;"> pub struct</span><span style="color: #F9E2AF;font-style: italic;"> ReadBalance</span><span style="color: #89DCEB;">&lt;</span><span style="color: #9399B2;">&#39;</span><span style="color: #89B4FA;font-style: italic;">info</span><span style="color: #89DCEB;">&gt;</span><span style="color: #9399B2;"> {</span></span>
+<span class="giallo-l"><span style="color: #F9E2AF;font-style: italic;">    #</span><span style="color: #9399B2;">[</span><span style="color: #F9E2AF;font-style: italic;">account</span><span style="color: #9399B2;">(</span><span style="color: #CBA6F7;">mut</span><span style="color: #9399B2;">)]</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">    pub</span><span> unchecked_program</span><span style="color: #94E2D5;">:</span><span style="color: #F9E2AF;font-style: italic;"> UncheckedAccount</span><span style="color: #89DCEB;">&lt;</span><span style="color: #9399B2;">&#39;</span><span style="color: #89B4FA;font-style: italic;">info</span><span style="color: #89DCEB;">&gt;</span><span style="color: #9399B2;">,</span><span style="color: #9399B2;font-style: italic;"> ///when we read an account balance</span></span>
+<span class="giallo-l"><span style="color: #9399B2;"> }</span></span></code></pre><h3 id="account">Account<T></h3>
+<p>Account<T> will verify the account is owned by the current program. If ownership does not match, the instruction fails immediately. This pervents accidentally reading or writing data that the program did not create.</p>
+<p>Account<T> will check:</p>
+<p>1.the account is owned by the current program
+2.whether the data can be deserialized.</p>
+<h3 id="uncheckedaccount-accountinfo">uncheckedAccount / AccountInfo:</h3>
+<p>1.it does not check the owner or the data format
+2.it is suitable for: only read lamports/CPI transit account addresses</p>
+<p>*** Attackers can forge account data**</p>
+<h3 id="signer-info">Signer&lt;'info&gt;</h3>
+<p>It will check whether the account participated in transaction signing, it does not check the owner or the data.</p>
+<p>Commonly used for:</p>
+<p>1.User authentication
+2.Access control
+3.Multi-signature logic</p>
+<h3 id="program-info-t">Program&lt;'info, T&gt;</h3>
+<p>it represents an executabkle account, can be used makeing CPI to call it</p>
+<h2 id="0x08">0x08</h2>
+<p>In Solana, off-chain client can read a storage account directly.
+Any off-chain client — and even another on-chain program — can read account data directly, as long as:</p>
+<p>the account public key is provided in the transaction, and</p>
+<p>the program knows how to interpret the raw bytes.</p>
+<p>In Anchor we use two programs:</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="rust"><span class="giallo-l"><span>data_holder</span></span>
+<span class="giallo-l"><span>  └── </span><span style="color: #FAB387;">PDA</span><span style="color: #9399B2;"> (</span><span style="color: #F9E2AF;font-style: italic;">Storage</span><span style="color: #9399B2;"> {</span><span> x</span><span style="color: #94E2D5;">:</span><span style="color: #CBA6F7;"> u64</span><span style="color: #9399B2;"> })</span><span style="color: #9399B2;font-style: italic;">  //owns and initialize a PDA storing data</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>data_reader</span></span>
+<span class="giallo-l"><span>  └── reads</span><span style="color: #FAB387;"> PDA</span><span> data via</span><span style="color: #F9E2AF;font-style: italic;"> UncheckedAccount</span><span style="color: #9399B2;font-style: italic;">  //reads the PDA data on-chain</span></span>
+<span class="giallo-l"></span></code></pre><h3 id="accounts-data-stores-in-anchor">Accounts data stores in Anchor</h3>
+<p>an Anchor account is laid out as raw bytes:</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="rust"><span class="giallo-l"><span style="color: #94E2D5;">|</span><span style="color: #FAB387;">    8</span><span> bytes</span><span style="color: #94E2D5;">    |</span><span style="color: #F9E2AF;font-style: italic;">          N</span><span> bytes</span><span style="color: #94E2D5;">         |</span></span>
+<span class="giallo-l"><span style="color: #94E2D5;">|---------------|--------------------------|</span></span>
+<span class="giallo-l"><span style="color: #94E2D5;">|</span><span style="color: #F9E2AF;font-style: italic;"> Discriminator</span><span style="color: #94E2D5;"> |</span><span style="color: #F9E2AF;font-style: italic;"> Serialized</span><span style="color: #CBA6F7;"> struct</span><span> fields</span><span style="color: #94E2D5;"> |</span></span>
+<span class="giallo-l"></span></code></pre>
+<p>the first 8 bytes: account discriminator
+the rest: the struct serialized field-by-field</p>
+<p>for example:</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="rust"><span class="giallo-l"><span style="color: #F9E2AF;font-style: italic;">#</span><span style="color: #9399B2;">[</span><span style="color: #F9E2AF;font-style: italic;">account</span><span style="color: #9399B2;">]</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">pub struct</span><span style="color: #F9E2AF;font-style: italic;"> Storage</span><span style="color: #9399B2;"> {</span></span>
+<span class="giallo-l"><span>  x</span><span style="color: #94E2D5;">:</span><span style="color: #CBA6F7;"> u64</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">}</span></span>
+<span class="giallo-l"><span> </span></span></code></pre>
+<p>the total size is <code>8(discriminator) + 8(u64) = 16 bytes</code></p>
+<h3 id="reading-another-program-s-account">Reading another program's account</h3>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="rust"><span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">let mut</span><span> data_slice</span><span style="color: #94E2D5;">: &amp;</span><span style="color: #9399B2;">[</span><span style="color: #CBA6F7;">u8</span><span style="color: #9399B2;">]</span><span style="color: #94E2D5;"> = &amp;</span><span>data_account</span><span style="color: #94E2D5;">.</span><span>data</span><span style="color: #94E2D5;">.</span><span style="color: #89B4FA;font-style: italic;">borrow</span><span style="color: #9399B2;">();</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">let</span><span> data_struct</span><span style="color: #94E2D5;">:</span><span style="color: #F9E2AF;font-style: italic;"> Storage</span><span style="color: #94E2D5;"> =</span><span style="color: #F9E2AF;font-style: italic;"> AccountDeserialize</span><span style="color: #94E2D5;">::</span><span style="color: #89B4FA;font-style: italic;">try_deserialize</span><span style="color: #9399B2;">(</span><span style="color: #94E2D5;">&amp;</span><span style="color: #CBA6F7;">mut</span><span> data_slice</span><span style="color: #9399B2;">)</span><span style="color: #94E2D5;">?</span><span style="color: #9399B2;">;</span></span>
+<span class="giallo-l"></span></code></pre>
+<p>Key observations</p>
+<p>UncheckedAccount&lt;'info&gt; is required (beacuse the current program does not own this account)</p>
+<p>Anchor only:</p>
+<p><em>checks the discriminator</em></p>
+<p><em>checks that there are enough bytes</em></p>
+<p>It does <strong>NOT</strong>:</p>
+<p><em>validate field names</em></p>
+<p><em>validate semantic meaning</em></p>
+<p><em>validate business correctness</em></p>
+<h3 id="not-check-in-anchor">NOT check in Anchor</h3>
+<ol>
+<li>field name not match(will pass)</li>
+</ol>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="rust"><span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">pub struct</span><span style="color: #F9E2AF;font-style: italic;"> Storage</span><span style="color: #9399B2;"> {</span></span>
+<span class="giallo-l"><span>  y</span><span style="color: #94E2D5;">:</span><span style="color: #CBA6F7;"> u64</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">}</span></span></code></pre>
+<p>Anchor only cares about byte position, not field name</p>
+<ol start="2">
+<li>field type mismatch(will pass)</li>
+</ol>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="rust"><span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">pub struct</span><span style="color: #F9E2AF;font-style: italic;"> Storage</span><span style="color: #9399B2;"> {</span></span>
+<span class="giallo-l"><span>  y</span><span style="color: #94E2D5;">:</span><span style="color: #CBA6F7;"> u32</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">}</span></span>
+<span class="giallo-l"></span></code></pre>
+<p><code>u32</code> only reads the first 4 bytes(it may lead to silent data corruption.)</p>
+<ol start="3">
+<li>read more data than exists(not pass)</li>
+</ol>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="rust"><span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">pub struct</span><span style="color: #F9E2AF;font-style: italic;"> Storage</span><span style="color: #9399B2;"> {</span></span>
+<span class="giallo-l"><span>  y</span><span style="color: #94E2D5;">:</span><span style="color: #CBA6F7;"> u64</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span>  z</span><span style="color: #94E2D5;">:</span><span style="color: #CBA6F7;"> u64</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">}</span></span>
+<span class="giallo-l"></span></code></pre>
+<p>the account only has 16 bytes and this has 24(8+ 16)bytes.</p>
+<h2 id="0x09">0x09</h2>
+<p>CPI
+Cross Program Invocation: a program calls the public function of other program in Solana.</p>
+<h3 id="the-simplest-cpi-example-system-program">The simplest CPI example: System Program</h3>
+<p>when transfer SOL via the system program:</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="rust"><span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">pub fn</span><span style="color: #89B4FA;font-style: italic;"> send_sol</span><span style="color: #9399B2;">(</span><span style="color: #EBA0AC;">ctx</span><span style="color: #94E2D5;">:</span><span style="color: #F9E2AF;font-style: italic;"> Context</span><span style="color: #89DCEB;">&lt;</span><span style="color: #F9E2AF;font-style: italic;">SendSol</span><span style="color: #89DCEB;">&gt;</span><span style="color: #9399B2;">,</span><span style="color: #EBA0AC;"> amount</span><span style="color: #94E2D5;">:</span><span style="color: #CBA6F7;"> u64</span><span style="color: #9399B2;">)</span><span style="color: #94E2D5;"> -&gt;</span><span style="color: #F9E2AF;font-style: italic;"> Result</span><span style="color: #89DCEB;">&lt;</span><span style="color: #9399B2;">()</span><span style="color: #89DCEB;">&gt;</span><span style="color: #9399B2;"> {</span></span>
+<span class="giallo-l"><span>  </span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">  let</span><span> cpi_context</span><span style="color: #94E2D5;"> =</span><span style="color: #F9E2AF;font-style: italic;"> CpiContext</span><span style="color: #94E2D5;">::</span><span style="color: #89B4FA;font-style: italic;">new</span><span style="color: #9399B2;">(</span></span>
+<span class="giallo-l"><span>    ctx</span><span style="color: #94E2D5;">.</span><span style="color: #89B4FA;">accounts</span><span style="color: #94E2D5;">.</span><span style="color: #89B4FA;">system_program</span><span style="color: #9399B2;">,</span><span style="color: #89B4FA;font-style: italic;">to_account_info</span><span style="color: #9399B2;">(),</span></span>
+<span class="giallo-l"><span style="color: #F9E2AF;">    system_program</span><span style="color: #94E2D5;">::</span><span style="color: #F9E2AF;font-style: italic;">Transfer</span><span style="color: #9399B2;"> (</span></span>
+<span class="giallo-l"><span>      from</span><span style="color: #94E2D5;">:</span><span> ctx</span><span style="color: #94E2D5;">.</span><span style="color: #89B4FA;">accounts</span><span style="color: #94E2D5;">.</span><span style="color: #89B4FA;">signer</span><span style="color: #94E2D5;">.</span><span style="color: #89B4FA;font-style: italic;">to_account_info</span><span style="color: #9399B2;">(),</span></span>
+<span class="giallo-l"><span>      to</span><span style="color: #94E2D5;">:</span><span> ctx</span><span style="color: #94E2D5;">.</span><span style="color: #89B4FA;">accounts</span><span style="color: #94E2D5;">.</span><span style="color: #89B4FA;">recipient</span><span style="color: #94E2D5;">.</span><span style="color: #89B4FA;font-style: italic;">to_account_info</span><span style="color: #9399B2;">(),</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">    )</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">  );</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #F9E2AF;">  system_program</span><span style="color: #94E2D5;">::</span><span style="color: #89B4FA;font-style: italic;">transfer</span><span style="color: #9399B2;">(</span><span>cpi_context</span><span style="color: #9399B2;">,</span><span> amount</span><span style="color: #9399B2;">)</span><span style="color: #94E2D5;">?</span><span style="color: #9399B2;">;</span></span>
+<span class="giallo-l"><span style="color: #F9E2AF;font-style: italic;">  Ok</span><span style="color: #9399B2;">(())</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">}</span></span>
+<span class="giallo-l"></span></code></pre>
+<p>There is already a full CPI call.</p>
+<h3 id="use-cases-of-cpi-in-solana-anchor">Use cases of CPI in Solana/Anchor</h3>
+<ol>
+<li>sol transfer</li>
+</ol>
+<p>just like code mentioned above.</p>
+<p>Agreement on transaction fees</p>
+<p>Reward distribution</p>
+<p>PDA transfers funds to users(<code>invoke_signed</code>)</p>
+<p>What we should be aware of:</p>
+<p>PDA tranfers must use <code>invoke_signed</code>, and verify that the from account is indeed the account you expected.</p>
+<ol start="2">
+<li>DeFi/ dex transaction</li>
+</ol>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="rust"><span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #F9E2AF;">raydium</span><span style="color: #94E2D5;">::</span><span style="color: #89B4FA;font-style: italic;">swap</span><span style="color: #9399B2;">(</span><span style="color: #94E2D5;">...</span><span style="color: #9399B2;">)</span></span>
+<span class="giallo-l"><span style="color: #F9E2AF;">orca</span><span style="color: #94E2D5;">::</span><span style="color: #89B4FA;font-style: italic;">swap</span><span style="color: #9399B2;">(</span><span style="color: #94E2D5;">...</span><span style="color: #9399B2;">)</span></span>
+<span class="giallo-l"><span style="color: #F9E2AF;">phoenix</span><span style="color: #94E2D5;">::</span><span style="color: #89B4FA;font-style: italic;">place_order</span><span style="color: #9399B2;">(</span><span style="color: #94E2D5;">...</span><span style="color: #9399B2;">)</span></span>
+<span class="giallo-l"></span></code></pre>
+<p>it usually uses in Aggregated trading, Arbitrage, Route matching.</p>
+<ol start="3">
+<li>Lending/ Flash Loan/ Oracle</li>
+</ol>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="rust"><span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #F9E2AF;">lending</span><span style="color: #94E2D5;">::</span><span style="color: #89B4FA;font-style: italic;">borrow</span><span style="color: #9399B2;">(</span><span style="color: #94E2D5;">...</span><span style="color: #9399B2;">)</span></span>
+<span class="giallo-l"><span style="color: #F9E2AF;">lending</span><span style="color: #94E2D5;">::</span><span style="color: #89B4FA;font-style: italic;">repay</span><span style="color: #9399B2;">(</span><span style="color: #94E2D5;">...</span><span style="color: #9399B2;">)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #F9E2AF;">pyth</span><span style="color: #94E2D5;">::</span><span style="color: #89B4FA;font-style: italic;">get_price</span><span style="color: #9399B2;">(</span><span style="color: #94E2D5;">...</span><span style="color: #9399B2;">)</span></span>
+<span class="giallo-l"><span style="color: #F9E2AF;">switchboard</span><span style="color: #94E2D5;">::</span><span style="color: #89B4FA;font-style: italic;">read_feed</span><span style="color: #9399B2;">(</span><span style="color: #94E2D5;">...</span><span style="color: #9399B2;">)</span></span>
+<span class="giallo-l"></span></code></pre><h2 id="0x10">0x10</h2>
+<p>invoke_signed</p>
+<p>As mentioned earlier,  <code>invoke_signed</code> is required when the PDA involves transactions, because the PDA does not have a private key and can not be acted as a signer. <code>invoke_signed</code> is precisely in this context that it allows the PDA  to execute contract calls. Specifically, it allows Solana to verify the PDA's identity based on the PDA account's <code>seeds</code> and <code>bump</code>.</p>
+<p>Only seeds cause "permission hijacking":</p>
+<p>seeds are the only "privilege input provided by the program that can be abused by the program" in invoke_signed.program_id(publickey) and bump, none of them have the ability to express permissions.</p>
+<p>although invoke_signed has three elements:</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="rust"><span class="giallo-l"></span>
+<span class="giallo-l"><span>invoke_signed</span><span style="color: #9399B2;"> (</span></span>
+<span class="giallo-l"><span>  program_id</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span>  seeds</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span>  bump</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">)</span></span>
+<span class="giallo-l"></span></code></pre>
+<p><code>bump</code>: a bump has no semantic meaning, and does not represent user, permissions, ownership and identity, it just a mathematical padding bit, a correction value to prevent the PDA from falling on the ed25519 curve.</p>
+<p><code>program_id</code>: the currently executing program and can not be forged by the user or the CPI caller. It is automatically determined by the runtime.</p>
+<p><code>seeds</code> was decided:</p>
+<p>"What does this PDA "stand for"</p>
+<p>"Which logical domain does this PDA belong to"</p>
+<p>"Whether this PDA is allowed to be signed under the current semantics"</p>
+<p>"commonly put" in seeds:</p>
+<ol>
+<li>domain separator:</li>
+</ol>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="rust"><span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #A6E3A1;">b&quot;vault&quot;</span></span>
+<span class="giallo-l"><span style="color: #A6E3A1;">b&quot;config&quot;</span></span>
+<span class="giallo-l"><span style="color: #A6E3A1;">b&quot;authority&quot;</span></span>
+<span class="giallo-l"></span></code></pre>
+<p>purpose:</p>
+<p>Differentiating PDA namespace</p>
+<p>Anti-collision</p>
+<p>Protect against misuse</p>
+<ol start="2">
+<li>PublicKey</li>
+</ol>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="rust"><span class="giallo-l"></span>
+<span class="giallo-l"><span>user</span><span style="color: #94E2D5;">.</span><span style="color: #89B4FA;font-style: italic;">key</span><span style="color: #9399B2;">()</span><span style="color: #94E2D5;">.</span><span style="color: #89B4FA;font-style: italic;">as_ref</span><span style="color: #9399B2;">()</span></span>
+<span class="giallo-l"><span>market</span><span style="color: #94E2D5;">.</span><span style="color: #89B4FA;font-style: italic;">key</span><span style="color: #9399B2;">()</span><span style="color: #94E2D5;">.</span><span style="color: #89B4FA;font-style: italic;">as_ref</span><span style="color: #9399B2;">()</span></span>
+<span class="giallo-l"><span>mint</span><span style="color: #94E2D5;">.</span><span style="color: #89B4FA;font-style: italic;">key</span><span style="color: #9399B2;">()</span><span style="color: #94E2D5;">.</span><span style="color: #89B4FA;font-style: italic;">as_ref</span><span style="color: #9399B2;">()</span></span>
+<span class="giallo-l"></span></code></pre>
+<p>purpose:</p>
+<p>means "to whom"</p>
+<p>indicates "which object to associate"</p>
+<ol start="3">
+<li>number / index</li>
+</ol>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="rust"><span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #94E2D5;">&amp;</span><span>index</span><span style="color: #94E2D5;">.</span><span style="color: #89B4FA;font-style: italic;">to_le_bytes</span><span style="color: #9399B2;">()</span></span>
+<span class="giallo-l"></span></code></pre>
+<p>purpose:</p>
+<p>multiple instances</p>
+<p>position id</p>
+<p>order id</p>
+<ol start="4">
+<li>hash</li>
+</ol>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="rust"><span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #89B4FA;font-style: italic;">hash</span><span style="color: #9399B2;">(</span><span>data</span><span style="color: #9399B2;">)</span><span style="color: #94E2D5;">.</span><span style="color: #89B4FA;font-style: italic;">to_bytes</span><span style="color: #9399B2;">()</span></span>
+<span class="giallo-l"></span></code></pre>
+<p>purpose:</p>
+<p>Compress complex information</p>
+<p>Hide original structure</p>
+<ol start="5">
+<li>The key of the PDA itself (hierarchical PDA)</li>
+</ol>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="rust"><span class="giallo-l"></span>
+<span class="giallo-l"><span>vault</span><span style="color: #94E2D5;">.</span><span style="color: #89B4FA;font-style: italic;">key</span><span style="color: #9399B2;">()</span><span style="color: #94E2D5;">.</span><span style="color: #89B4FA;font-style: italic;">as_ref</span><span style="color: #9399B2;">()</span></span></code></pre>
+<p>purpose:</p>
+<p>Derive child object from "parent object"</p>
+<p>Ref: <a rel="external" href="https://rareskills.io/solana-tutorial">rareskills</a>
+<a rel="external" href="https://blog.asymmetric.re/invocation-security-navigating-vulnerabilities-in-solana-cpis/#how-cpi-works-in-solana">blog</a></p>
+
+  </div>
+</article>
+
+    </main>
+
+    <footer class="site-footer">
+      <p>Built with Zola</p>
+    </footer>
+  </div>
+</body>
+</html>
