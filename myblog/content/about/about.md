@@ -7,6 +7,10 @@ path = "about"
 
 other names: spn moon mouzi
 
+interest in arknight,love Skadi、Texas the Omertosa、Muelsyse and Ling.
+
+the Ultimate Cybersociety Phobic.
+
 ## 联系方式
 
 - GitHub: https://github.com/spn21

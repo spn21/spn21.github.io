@@ -3,11 +3,9 @@
 {% block content %}
 {% set blog_section = get_section(path="blog/_index.md") %}
 
-<section class="hero-section">
+  <section class="hero-section">
   <div class="hero-logo" aria-hidden="true">
-    <svg viewBox="0 0 24 24" fill="none">
-      <path d="M13 2.8V10h6.3L11 21.2V14H4.7L13 2.8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path>
-    </svg>
+    <img class="hero-avatar" src="https://q.qlogo.cn/g?b=qq&nk=378115229&s=100" alt="QQ 头像">
   </div>
   <h1 class="hero-title">{% if config.title != "" %}{{ config.title }}{% else %}厶月{% endif %}</h1>
   <p class="hero-subtitle">{% if config.description != "" %}{{ config.description }}{% else %}spn、mouzi{% endif %}</p>
