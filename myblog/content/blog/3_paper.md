@@ -124,8 +124,42 @@ Algorand 天然消除的漏洞:
 - Fine-Tuning(LoRA)
 - Prompt Engineering(角色提示)
 
+  prompt示例:
+  ```
+     You are a smart contract security analyzer.
+     The vulnerabilities are classified according to OWASP Top 10.
+  ```
+
 二者结合
 
+- Solana（Rust）
+
+Prompt Engineering 单独就很强
+
+DeepSeek 在不微调的情况下表现已接近上限
+
+- Algorand（PyTeal）
+
+Fine-Tuning 明显更重要
+
+LLaMA 在「Prompt + Fine-Tuning」下达到最佳表现（0.65）
+
+### 最终结论
+
+
+1. OWASP 漏洞在非 EVM 中仍然有意义，但必须重映射
+
+2. LLM 可以作为非 EVM 静态分析的可行工具
+
+3. 语言表达能力决定 LLM 上限
+
+- Rust > PyTeal
+
+4. Prompt Engineering ≠ 玩具
+
+- 在 Solana 上几乎等同于 Fine-Tuning
+
+5. Fine-Tuning 更适合低层 DSL
 
 另:
 
