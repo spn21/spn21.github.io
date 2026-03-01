@@ -4,6 +4,7 @@ date = 2025-11-28
 
 [extra]
 cover_image = "/covers/second.jpg"
+cover_sentence = ""
 +++
 
 

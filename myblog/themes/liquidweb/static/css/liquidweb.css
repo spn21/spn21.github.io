@@ -297,6 +297,13 @@ a {
   background: rgba(255, 255, 255, 0.5);
 }
 
+.post-cover-sentence {
+  margin: 0 0 0.86rem;
+  color: var(--text-muted);
+  font-size: 0.93rem;
+  line-height: 1.6;
+}
+
 .post-meta {
   margin: 0;
   display: flex;
@@ -418,6 +425,13 @@ a {
   border-radius: 1rem;
   border: 1px solid var(--glass-border);
   box-shadow: var(--shadow-soft);
+}
+
+.article-cover-sentence {
+  margin: 0.62rem 0 0;
+  color: var(--text-muted);
+  line-height: 1.7;
+  font-size: 0.95rem;
 }
 
 .article-header h1 {

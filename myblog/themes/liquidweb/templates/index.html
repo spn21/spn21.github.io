@@ -39,6 +39,9 @@
             <a class="post-cover-link" href="{{ page.permalink | safe }}" aria-label="查看 {{ page.title }}">
               <img class="post-cover" src="{{ page.extra.cover_image }}" alt="{% if page.title %}{{ page.title }}{% else %}文章封面{% endif %}">
             </a>
+            {% if page.extra.cover_sentence is defined and page.extra.cover_sentence != "" %}
+              <p class="post-cover-sentence">{{ page.extra.cover_sentence }}</p>
+            {% endif %}
           {% endif %}
           <p class="post-meta">
             {% if page.date %}{{ page.date }}{% else %}未标注日期{% endif %}
@@ -51,7 +54,6 @@
               {% if page.title %}{{ page.title }}{% else %}{{ page.slug }}{% endif %}
             </a>
           </h3>
-          <p>{{ page.content | striptags | truncate(length=140) }}</p>
           <a class="post-link" href="{{ page.permalink | safe }}">阅读文章</a>
         </article>
       {% endfor %}

@@ -5,7 +5,11 @@
 {% endblock title %}
 
 {% block description %}
+{% if page.extra.cover_sentence is defined and page.extra.cover_sentence != "" %}
+{{ page.extra.cover_sentence }}
+{% else %}
 {{ page.content | striptags | truncate(length=140) }}
+{% endif %}
 {% endblock description %}
 
 {% block content %}
@@ -15,6 +19,9 @@
   {% if page.extra.cover_image is defined and page.extra.cover_image != "" %}
     <figure class="article-cover-wrap">
       <img class="article-cover" src="{{ page.extra.cover_image }}" alt="{% if page.title %}{{ page.title }}{% else %}文章封面{% endif %}">
+      {% if page.extra.cover_sentence is defined and page.extra.cover_sentence != "" %}
+        <figcaption class="article-cover-sentence">{{ page.extra.cover_sentence }}</figcaption>
+      {% endif %}
     </figure>
   {% endif %}
 
