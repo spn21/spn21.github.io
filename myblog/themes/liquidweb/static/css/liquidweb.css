@@ -304,6 +304,118 @@ a {
   line-height: 1.6;
 }
 
+.post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0 0 0.9rem;
+}
+
+.post-tag {
+  display: inline-block;
+  padding: 0.22rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(129, 140, 248, 0.35);
+  background: rgba(255, 255, 255, 0.72);
+  color: #334155;
+  font-size: 0.78rem;
+  line-height: 1.1;
+  font-weight: 600;
+}
+
+.category-block {
+  margin-top: 1.25rem;
+}
+
+.category-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.72rem;
+}
+
+.category-head h3 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.category-head span {
+  color: var(--text-soft);
+  font-size: 0.84rem;
+}
+
+.category-post-list {
+  display: grid;
+  gap: 0.72rem;
+}
+
+.category-post-item {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.55);
+  padding: 0.78rem 0.9rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.category-post-title {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.category-post-title a {
+  color: var(--text-main);
+  transition: opacity 0.2s ease;
+}
+
+.category-post-title a:hover {
+  opacity: 0.72;
+}
+
+.category-post-meta {
+  margin-top: 0.56rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
+.category-post-date {
+  color: var(--text-soft);
+  font-size: 0.82rem;
+}
+
+.category-tag-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  font-size: 0.75rem;
+}
+
+.category-tag {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.24rem 0.72rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.category-tag-primary {
+  background: rgba(99, 102, 241, 0.15);
+  color: #4f46e5;
+}
+
+.category-tag-warning {
+  background: rgba(245, 158, 11, 0.15);
+  color: #b45309;
+}
+
+.category-tag-info {
+  background: rgba(34, 197, 94, 0.15);
+  color: #15803d;
+}
+
 .post-meta {
   margin: 0;
   display: flex;
@@ -432,6 +544,11 @@ a {
   color: var(--text-muted);
   line-height: 1.7;
   font-size: 0.95rem;
+}
+
+.article-tags {
+  margin-top: 0.62rem;
+  margin-bottom: 0;
 }
 
 .article-header h1 {

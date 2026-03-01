@@ -28,7 +28,7 @@
 <section class="posts-section" id="latest-posts">
   <div class="section-heading">
     <h2>最新文章</h2>
-    <p><a class="post-link" href="{{ get_url(path='@/blog/_index.md') }}">查看全部</a></p>
+    <p><a class="post-link" href="{{ get_url(path='@/categories.md') }}">查看全部</a></p>
   </div>
 
   {% if blog_section.pages | length > 0 %}
@@ -41,6 +41,13 @@
             </a>
             {% if page.extra.cover_sentence is defined and page.extra.cover_sentence != "" %}
               <p class="post-cover-sentence">{{ page.extra.cover_sentence }}</p>
+            {% endif %}
+            {% if page.extra.tags is defined and page.extra.tags | length > 0 %}
+              <div class="post-tags">
+                {% for tag in page.extra.tags %}
+                  <span class="post-tag">{{ tag }}</span>
+                {% endfor %}
+              </div>
             {% endif %}
           {% endif %}
           <p class="post-meta">

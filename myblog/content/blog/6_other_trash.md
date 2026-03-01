@@ -5,6 +5,7 @@ date = 2026-03-01
 [extra]
 cover_image = "/covers/second.jpg"
 cover_sentence = "|||"
+tags = ["杂谈", "随笔", "note"]
 +++
 
 ## 东西南北中
@@ -26,4 +27,3 @@ cover_sentence = "|||"
 ### 推理文字类
 
 ### 二游
-
