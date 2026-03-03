@@ -4,7 +4,7 @@ date = 2026-03-01
 
 [extra]
 cover_image = "/covers/second.jpg"
-cover_sentence = "|||"
+cover_sentence = "铁花飞，飘逸不残灰"
 tags = ["杂谈", "随笔", "note"]
 +++
 
