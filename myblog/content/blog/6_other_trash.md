@@ -6,6 +6,7 @@ date = 2026-03-01
 cover_image = "/covers/6/6.png"
 cover_sentence = "铁花飞，飘逸不残灰"
 tags = ["杂谈", "随笔", "note"]
+draft = true
 +++
 
 ## 东西南北中

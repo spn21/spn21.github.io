@@ -31,43 +31,52 @@
     <p><a class="post-link" href="{{ get_url(path='@/categories.md') }}">查看全部</a></p>
   </div>
 
-  {% if blog_section.pages | length > 0 %}
+  {% set_global published_count = 0 %}
+  {% for page in blog_section.pages %}
+    {% if page.extra.draft is defined and page.extra.draft == false %}
+      {% set_global published_count = published_count + 1 %}
+    {% endif %}
+  {% endfor %}
+
+  {% if published_count > 0 %}
     <div class="post-grid">
       {% for page in blog_section.pages %}
-        <article class="post-card">
-          {% if page.extra.cover_image is defined and page.extra.cover_image != "" %}
-            <a class="post-cover-link" href="{{ page.permalink | safe }}" aria-label="查看 {{ page.title }}">
-              <img class="post-cover" src="{{ page.extra.cover_image }}" alt="{% if page.title %}{{ page.title }}{% else %}文章封面{% endif %}">
-            </a>
-            {% if page.extra.cover_sentence is defined and page.extra.cover_sentence != "" %}
-              <p class="post-cover-sentence">{{ page.extra.cover_sentence }}</p>
+        {% if page.extra.draft is defined and page.extra.draft == false %}
+          <article class="post-card">
+            {% if page.extra.cover_image is defined and page.extra.cover_image != "" %}
+              <a class="post-cover-link" href="{{ page.permalink | safe }}" aria-label="查看 {{ page.title }}">
+                <img class="post-cover" src="{{ page.extra.cover_image }}" alt="{% if page.title %}{{ page.title }}{% else %}文章封面{% endif %}">
+              </a>
+              {% if page.extra.cover_sentence is defined and page.extra.cover_sentence != "" %}
+                <p class="post-cover-sentence">{{ page.extra.cover_sentence }}</p>
+              {% endif %}
+              {% if page.extra.tags is defined and page.extra.tags | length > 0 %}
+                <div class="post-tags">
+                  {% for tag in page.extra.tags %}
+                    <span class="post-tag">{{ tag }}</span>
+                  {% endfor %}
+                </div>
+              {% endif %}
             {% endif %}
-            {% if page.extra.tags is defined and page.extra.tags | length > 0 %}
-              <div class="post-tags">
-                {% for tag in page.extra.tags %}
-                  <span class="post-tag">{{ tag }}</span>
-                {% endfor %}
-              </div>
-            {% endif %}
-          {% endif %}
-          <p class="post-meta">
-            {% if page.date %}{{ page.date }}{% else %}未标注日期{% endif %}
-            {% if page.reading_time %}
-              <span>{{ page.reading_time }} 分钟阅读</span>
-            {% endif %}
-          </p>
-          <h3>
-            <a href="{{ page.permalink | safe }}">
-              {% if page.title %}{{ page.title }}{% else %}{{ page.slug }}{% endif %}
-            </a>
-          </h3>
-          <a class="post-link" href="{{ page.permalink | safe }}">阅读文章</a>
-        </article>
+            <p class="post-meta">
+              {% if page.date %}{{ page.date }}{% else %}未标注日期{% endif %}
+              {% if page.reading_time %}
+                <span>{{ page.reading_time }} 分钟阅读</span>
+              {% endif %}
+            </p>
+            <h3>
+              <a href="{{ page.permalink | safe }}">
+                {% if page.title %}{{ page.title }}{% else %}{{ page.slug }}{% endif %}
+              </a>
+            </h3>
+            <a class="post-link" href="{{ page.permalink | safe }}">阅读文章</a>
+          </article>
+        {% endif %}
       {% endfor %}
     </div>
   {% else %}
     <div class="empty-state">
-      <p>还没有文章内容，可以先在 <code>content/blog/</code> 下新增一篇 Markdown。</p>
+      <p>当前没有已发布文章，将文章 front matter 中的 <code>draft</code> 改成 <code>false</code> 后即可显示。</p>
     </div>
   {% endif %}
 </section>

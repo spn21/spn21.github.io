@@ -36,43 +36,69 @@
 
   {% if blog_section.pages | length > 0 %}
     {% set grouped = blog_section.pages | group_by(attribute="extra.tags.0") %}
-    {% for category, pages in grouped %}
-      <div class="category-block">
-        <div class="category-head">
-          <h3>{{ category }}</h3>
-          <span>{{ pages | length }} 篇</span>
-        </div>
-
-        {% set sorted_pages = pages | sort(attribute="date") | reverse %}
-        <div class="category-post-list">
-          {% for page in sorted_pages %}
-            <article class="category-post-item">
-              <h4 class="category-post-title">
-                <a href="{{ page.permalink | safe }}">
-                  {% if page.title %}{{ page.title }}{% else %}{{ page.slug }}{% endif %}
-                </a>
-              </h4>
-              <div class="category-post-meta">
-                <span class="category-post-date">{% if page.date %}{{ page.date }}{% else %}未标注日期{% endif %}</span>
-                {% if page.extra.tags is defined and page.extra.tags | length > 0 %}
-                  <div class="category-tag-cloud">
-                    {% for tag in page.extra.tags %}
-                      {% if loop.index0 % 3 == 0 %}
-                        <span class="category-tag category-tag-primary">{{ tag }}</span>
-                      {% elif loop.index0 % 3 == 1 %}
-                        <span class="category-tag category-tag-warning">{{ tag }}</span>
-                      {% else %}
-                        <span class="category-tag category-tag-info">{{ tag }}</span>
-                      {% endif %}
-                    {% endfor %}
-                  </div>
-                {% endif %}
-              </div>
-            </article>
-          {% endfor %}
-        </div>
-      </div>
+    {% set_global published_total = 0 %}
+    {% for _category, pages in grouped %}
+      {% for page in pages %}
+        {% if page.extra.draft is defined and page.extra.draft == false %}
+          {% set_global published_total = published_total + 1 %}
+        {% endif %}
+      {% endfor %}
     {% endfor %}
+
+    {% if published_total > 0 %}
+      {% for category, pages in grouped %}
+        {% set sorted_pages = pages | sort(attribute="date") | reverse %}
+        {% set_global visible_count = 0 %}
+        {% for page in sorted_pages %}
+          {% if page.extra.draft is defined and page.extra.draft == false %}
+            {% set_global visible_count = visible_count + 1 %}
+          {% endif %}
+        {% endfor %}
+
+        {% if visible_count > 0 %}
+          <div class="category-block">
+            <div class="category-head">
+              <h3>{{ category }}</h3>
+              <span>{{ visible_count }} 篇</span>
+            </div>
+
+            <div class="category-post-list">
+              {% for page in sorted_pages %}
+                {% if page.extra.draft is defined and page.extra.draft == false %}
+                  <article class="category-post-item">
+                    <h4 class="category-post-title">
+                      <a href="{{ page.permalink | safe }}">
+                        {% if page.title %}{{ page.title }}{% else %}{{ page.slug }}{% endif %}
+                      </a>
+                    </h4>
+                    <div class="category-post-meta">
+                      <span class="category-post-date">{% if page.date %}{{ page.date }}{% else %}未标注日期{% endif %}</span>
+                      {% if page.extra.tags is defined and page.extra.tags | length > 0 %}
+                        <div class="category-tag-cloud">
+                          {% for tag in page.extra.tags %}
+                            {% if loop.index0 % 3 == 0 %}
+                              <span class="category-tag category-tag-primary">{{ tag }}</span>
+                            {% elif loop.index0 % 3 == 1 %}
+                              <span class="category-tag category-tag-warning">{{ tag }}</span>
+                            {% else %}
+                              <span class="category-tag category-tag-info">{{ tag }}</span>
+                            {% endif %}
+                          {% endfor %}
+                        </div>
+                      {% endif %}
+                    </div>
+                  </article>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    {% else %}
+      <div class="empty-state">
+        <p>当前所有文章都还是草稿，先把目标文章的 <code>draft</code> 改成 <code>false</code> 即可显示。</p>
+      </div>
+    {% endif %}
   {% else %}
     <div class="empty-state">
       <p>还没有文章内容，可以先在 <code>content/blog/</code> 下新增一篇 Markdown。</p>

@@ -6,6 +6,7 @@ date = 2025-11-28
 cover_image = "/covers/second.jpg"
 cover_sentence = ""
 tags = ["Solana", "token", "note"]
+draft = false
 +++
 
 

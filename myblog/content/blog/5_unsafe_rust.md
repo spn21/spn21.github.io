@@ -6,4 +6,5 @@ date = 2026-02-20
 cover_image = "/covers/5.png"
 cover_sentence = "好好学习"
 tags = ["Rust", "unsafe", "note"]
+draft = true
 +++
