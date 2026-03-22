@@ -4,7 +4,7 @@ date = 2026-02-12
 
 [extra]
 cover_image = "/covers/forth.jpeg"
-cover_sentence = ""
+cover_sentence = " "
 tags = ["Solana", "account", "note"]
 draft = false
 +++
