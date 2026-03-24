@@ -1,5 +1,5 @@
 +++
-title = "非 EVM 智能合约漏洞检测：Prompt 与 Fine-Tuning 对比"
+title = "Some papers"
 date = 2026-02-14
 
 [extra]
@@ -8,6 +8,8 @@ cover_sentence = " "
 tags = ["Security", "LLM", "paper"]
 draft = false
 +++
+
+# 非 EVM 智能合约漏洞检测：Prompt 与 Fine-Tuning 对比
 
 核心方向：过去十年，Ethereum / Solidity 几乎定义了智能合约安全研究的全部语境：
 SWC Registry、Slither、Mythril、SmartCheck……
