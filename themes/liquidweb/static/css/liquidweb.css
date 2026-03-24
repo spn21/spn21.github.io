@@ -169,13 +169,13 @@ a {
   gap: 2.2rem;
 }
 
-.hero-section {
+.section {
   text-align: center;
   padding: 3.1rem 0.9rem 2.2rem;
   animation: rise-up 0.9s ease both;
 }
 
-.hero-logo {
+.logo {
   width: 6rem;
   height: 6rem;
   margin: 0 auto 1.4rem;
@@ -189,24 +189,24 @@ a {
   backdrop-filter: blur(26px) saturate(165%);
 }
 
-.hero-logo svg {
+.logo svg {
   width: 2.25rem;
   height: 2.25rem;
 }
 
-.hero-title {
+.title {
   margin: 0;
   font-size: clamp(2.1rem, 5.5vw, 3.2rem);
   letter-spacing: -0.02em;
 }
 
-.hero-subtitle {
+.subtitle {
   margin: 0.6rem auto 0;
   color: var(--text-muted);
   font-size: clamp(1.02rem, 2.8vw, 1.2rem);
 }
 
-.hero-actions {
+.actions {
   margin-top: 2.2rem;
   display: flex;
   justify-content: center;
@@ -506,7 +506,7 @@ a {
 }
 
 .article-shell {
-  width: min(880px, 100%);
+  width: min(840px, 100%);
   margin: 0 auto;
   background: var(--glass);
   border: 1px solid var(--glass-border);
@@ -515,6 +515,13 @@ a {
   backdrop-filter: blur(24px) saturate(155%);
   padding: clamp(1.2rem, 3.4vw, 2.1rem);
   animation: rise-up 0.8s ease both;
+
+}
+
+.article-content {
+  margin: 1.4rem auto 0;
+  max-width: 760px;
+  text-align: left;
 }
 
 .back-link {
@@ -646,7 +653,36 @@ a {
   color: var(--text-soft);
   font-size: 0.85rem;
 }
+#back-to-top {
+  position: fixed;
+  right: 1rem;
+  bottom: 1.2rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  line-height: 2.5rem;
+  text-align: center;
+  background: var(--glass);
+  color: var(--text-main);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(16px) saturate(160%);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  opacity: 0;
+  pointer-events: none;
+  text-decoration: none;
+  z-index: 999;
+}
 
+#back-to-top:hover {
+  transform: translateY(-2px);
+  opacity: 1;
+}
+
+#back-to-top.show {
+  opacity: 1;
+  pointer-events: auto;
+}
 .site-footer p {
   margin: 0;
 }

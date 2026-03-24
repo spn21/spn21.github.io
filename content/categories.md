@@ -1,5 +1,5 @@
 +++
 title = "分类"
 template = "blog.html"
-path = "blog/categories"
+path = "/blog/categories"
 +++

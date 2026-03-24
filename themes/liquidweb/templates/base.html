@@ -4,7 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{% if config.title != "" %}{{ config.title }}{% else %}厶月{% endif %}{% endblock title %}</title>
-  <meta name="description" content="{% block description %}{% if config.description != "" %}{{ config.description }}{% else %}spn、mouzi{% endif %}{% endblock description %}">
+  <meta name="description" content="{% block description %}{% if config.description != "" %}{{ config.description }}{% else %} {% endif %}{% endblock description %}">
+  <link rel="icon" href="{{ get_url(path='favicon.svg') }}" type="image/svg+xml">
+  <link rel="shortcut icon" href="{{ get_url(path='favicon.svg') }}" type="image/svg+xml">
   <link rel="stylesheet" href="{{ get_url(path='css/liquidweb.css') }}">
 </head>
 <body>
@@ -24,13 +26,13 @@
         </span>
         <span class="brand-copy">
           <strong>{% if config.title != "" %}{{ config.title }}{% else %}厶月{% endif %}</strong>
-          <small>{% if config.description != "" %}{{ config.description }}{% else %}spn、mouzi{% endif %}</small>
+          <small>{% if config.description != "" %}{{ config.description }}{% else %} {% endif %}</small>
         </span>
       </a>
       <nav class="site-nav">
         <a href="{{ get_url(path='@/_index.md') }}">首页</a>
         <a href="{{ get_url(path='@/categories.md') }}">分类</a>
-        <a href="{{ get_url(path='@/about/about.md') }}">关于</a>
+        <a href="{{ get_url(path='about') }}">关于</a>
       </nav>
     </header>
 
@@ -38,9 +40,23 @@
       {% block content %}{% endblock content %}
     </main>
 
+    <a id="back-to-top" href="#" title="返回顶部" aria-label="返回顶部">↑</a>
+
     <footer class="site-footer">
       <p>Built with Zola</p>
     </footer>
-  </div>
-</body>
+  </div><script>
+    const backTop = document.getElementById('back-to-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 200) {
+        backTop.classList.add('show');
+      } else {
+        backTop.classList.remove('show');
+      }
+    });
+    backTop.addEventListener('click', (event) => {
+      event.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script></body>
 </html>

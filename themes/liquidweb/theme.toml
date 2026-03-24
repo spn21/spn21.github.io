@@ -2,7 +2,6 @@ name = "liquidweb"
 description = "A glassmorphism-inspired Zola theme with gradient glow backgrounds."
 license = "MIT"
 min_version = "0.22.0"
-tags = ["blog", "glassmorphism", "clean", "responsive"]
 
 [extra]
 

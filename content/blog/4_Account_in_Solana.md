@@ -1,5 +1,5 @@
 +++
-title = "account in solana"
+title = "Account in solana"
 date = 2026-02-12
 
 [extra]
@@ -9,20 +9,7 @@ tags = ["Solana", "account", "note"]
 draft = false
 +++
 
----
-title: accounts and storage in Solana
-author: spn
-pubDatetime: 2025-12-15
-slug: 
-featured: false
-draft: false
-tags:
-  - solana
-  - anchor
-  - web3
-  - rust
-description: accounts in Solana
----
+
 
 ## 0x01
 
