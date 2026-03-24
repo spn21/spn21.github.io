@@ -1,11 +1,11 @@
 +++
-title = "Some papers"
+title = "LLM in web3 security"
 date = 2026-02-14
 
 [extra]
 cover_image = "/covers/third.png"
 cover_sentence = " "
-tags = ["Security", "LLM", "paper"]
+tags = ["paper","Security", "LLM"]
 draft = false
 +++
 
@@ -202,4 +202,4 @@ TABLE II:Mapping of Vulnerabilities (V1 – V10) in Algorand and Solana
 |V9|N/A.|PDA collisions from Bump Seed; similar to V6|
 |V10| Partially mitigated; DoS possible via Unchecked Transaction Fee and resource exhaustion |Leader election DoS possible if randomness is predictable; network disruption could occur.|
 
-[paper1:Prompt Engineering vs. Fine-Tuning for LLM-Based Vulnerability Detection in Solana and Algorand Smart Contracts](https://arxiv.org/abs/2511.11250)
+[paper:Prompt Engineering vs. Fine-Tuning for LLM-Based Vulnerability Detection in Solana and Algorand Smart Contracts](https://arxiv.org/abs/2511.11250)
