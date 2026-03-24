@@ -4,7 +4,7 @@ date = 2026-02-14
 
 [extra]
 cover_image = "/covers/third.png"
-cover_sentence = "rust相关漏洞感觉更可以适合llm学习(也许)？"
+cover_sentence = " "
 tags = ["Security", "LLM", "paper"]
 draft = false
 +++

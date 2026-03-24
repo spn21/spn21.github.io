@@ -30,7 +30,7 @@ This design is flexible, but it also means:
 - Different tokens may behave differently
 - Bugs or malicious logic can exist in individual token contracts
 
-On Solana, *** Token Logic $\neq$ Token Data ***
+On Solana, *** Token Logic isn't Token Data ***
 
 - All tokens share the same Token Program
 - Token logic lives in the SPL Token Program
@@ -63,7 +63,7 @@ Each SPL token has exactly one mint account, it stores global token metadata:
 - mint_authority
 - freeze_authority
 
-*** The mint address is the token address on Solana ***
+***The mint address is the token address on Solana***
 
 Mint accounyt does not store user balances, they only define token rules.
 

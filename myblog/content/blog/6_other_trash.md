@@ -3,7 +3,7 @@ title = "此是千秋第一秋"
 date = 2026-03-01
 
 [extra]
-cover_image = "/covers/6/6.png"
+cover_image = "/covers/6.jpg"
 cover_sentence = "铁花飞，飘逸不残灰"
 tags = ["杂谈", "随笔", "note"]
 draft = false
