@@ -40,8 +40,9 @@ jobs:
       - name: Build with Zola
         run: zola build
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
+          name: github-pages
           path: ./public
 
   # Deployment job
