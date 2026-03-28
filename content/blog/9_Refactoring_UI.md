@@ -3,10 +3,10 @@ title = "Note of Refactoring UI"
 date = 2026-03-25
 
 [extra]
-cover_image = "/covers/first.jpg"
+cover_image = "/covers/9/0.jpg"
 cover_sentence = " "
 tags = ["Learning", "UI", "frontend"]
-draft = true
+draft = false
 +++
 
 ## 0x01 Starting from Scratch
