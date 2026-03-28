@@ -5,7 +5,7 @@ date = 2026-03-12
 [extra]
 cover_image = "/covers/8/0.png"
 cover_sentence = ""
-tags = ["learing", "rust", "note"]
+tags = ["Solidity", "Learning", "Note"]
 draft = false
 +++
 
