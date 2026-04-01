@@ -1,0 +1,9 @@
+name = "cli"
+description = "A Claude Code CLI inspired dark theme with terminal aesthetics."
+license = "MIT"
+min_version = "0.22.0"
+
+[extra]
+
+[author]
+name = "Local Theme"

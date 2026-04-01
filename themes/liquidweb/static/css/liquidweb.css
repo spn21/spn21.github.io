@@ -164,6 +164,23 @@ a {
   background: rgba(255, 255, 255, 0.72);
 }
 
+.theme-switcher {
+  padding: 0.58rem 0.95rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  transition: transform 0.2s ease, background 0.2s ease;
+  cursor: pointer;
+}
+
+.theme-switcher:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.72);
+}
+
 .site-main {
   display: grid;
   gap: 2.2rem;

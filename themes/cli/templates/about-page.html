@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}
+{% if page.title %}{{ page.title }} | {% endif %}{% if config.title != "" %}{{ config.title }}{% else %}厶月{% endif %}
+{% endblock title %}
+
+{% block description %}
+{{ page.content | striptags | truncate(length=140) }}
+{% endblock description %}
+
+{% block content %}
+<article class="article-shell about-page">
+  <header class="article-header">
+    <h1>{% if page.title %}{{ page.title }}{% else %}厶月{% endif %}</h1>
+  </header>
+
+  <div class="article-content">
+    {{ page.content | safe }}
+  </div>
+</article>
+{% endblock content %}
