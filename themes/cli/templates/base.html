@@ -10,87 +10,45 @@
   <link rel="stylesheet" href="{{ get_url(path='css/cli.css') }}">
 </head>
 <body>
-  <div class="liquid-bg" aria-hidden="true">
-    <div class="liquid-overlay"></div>
-    <div class="liquid-glow liquid-glow-a"></div>
-    <div class="liquid-glow liquid-glow-b"></div>
-  </div>
-
   <div class="site-shell">
-    <header class="site-header">
-      <a class="brand" href="{{ get_url(path='@/_index.md') }}">
-        <span class="brand-logo" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none">
-            <path d="M13 2.8V10h6.3L11 21.2V14H4.7L13 2.8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path>
-          </svg>
-        </span>
-        <span class="brand-copy">
-          <strong>{% if config.title != "" %}{{ config.title }}{% else %}厶月{% endif %}</strong>
-          <small>{% if config.description != "" %}{{ config.description }}{% else %} {% endif %}</small>
-        </span>
-      </a>
-      <nav class="site-nav">
-        <a href="{{ get_url(path='@/_index.md') }}">首页</a>
-        <a href="{{ get_url(path='@/categories.md') }}">分类</a>
-        <a href="{{ get_url(path='about') }}">关于</a>
-        <button class="theme-switcher" id="theme-switcher" title="切换主题">🌙</button>
-      </nav>
-    </header>
+    <div class="terminal-frame">
+      <header class="terminal-bar">
+        <div class="terminal-lights" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        <div class="terminal-title">spn21.github.io :: cli</div>
+        <button class="theme-switcher" id="theme-switcher" title="切换主题">theme</button>
+      </header>
 
-    <main class="site-main">
-      {% block content %}{% endblock content %}
-    </main>
-
-    <a id="back-to-top" href="#" title="返回顶部" aria-label="返回顶部">↑</a>
-
-    <footer class="site-footer">
-      <p>Built with Zola</p>
-    </footer>
+      <main class="terminal-body">
+        {% block content %}{% endblock content %}
+      </main>
+    </div>
   </div>
 
   <script>
-    // Theme switcher functionality
     const themeSwitcher = document.getElementById('theme-switcher');
-    const htmlElement = document.documentElement;
-    
-    // Get saved theme preference or default to 'cli'
-    const currentTheme = localStorage.getItem('selectedTheme') || 'cli';
-    
-    // Initialize theme switcher button
+
     function updateThemeSwitcherUI() {
       const theme = localStorage.getItem('selectedTheme') || 'cli';
       if (theme === 'liquidweb') {
-        themeSwitcher.textContent = '💻';
+        themeSwitcher.textContent = 'theme: liquid';
         themeSwitcher.title = '切换到 CLI 主题';
       } else {
-        themeSwitcher.textContent = '🌙';
+        themeSwitcher.textContent = 'theme: cli';
         themeSwitcher.title = '切换到 Liquid 主题';
       }
     }
-    
+
     updateThemeSwitcherUI();
-    
+
     themeSwitcher.addEventListener('click', () => {
       const theme = localStorage.getItem('selectedTheme') || 'cli';
       const newTheme = theme === 'cli' ? 'liquidweb' : 'cli';
       localStorage.setItem('selectedTheme', newTheme);
-      
-      // Reload to apply theme
       window.location.reload();
-    });
-
-    // Back to top functionality
-    const backTop = document.getElementById('back-to-top');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 200) {
-        backTop.classList.add('show');
-      } else {
-        backTop.classList.remove('show');
-      }
-    });
-    backTop.addEventListener('click', (event) => {
-      event.preventDefault();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   </script>
 </body>
