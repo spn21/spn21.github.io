@@ -4,15 +4,20 @@
 {% set blog_section = get_section(path="blog/_index.md") %}
 <div class="shell-app" id="shell-app">
   <section class="shell-screen" id="shell-screen" aria-live="polite"></section>
-
-  <form class="shell-entry" id="shell-entry" autocomplete="off">
-    <label class="shell-prompt" for="shell-input">
-      <span class="prompt">visitor@spn21</span><span class="prompt-sep">:</span><span class="cwd" id="shell-cwd">~</span><span class="prompt-mark">$</span>
-    </label>
-    <input class="shell-input" id="shell-input" name="command" type="text" spellcheck="false" autofocus placeholder="type 'help'" />
-  </form>
-
-  <p class="shell-hint">commands: <code>help</code> <code>whoami</code> <code>ls</code> <code>cd blogs</code> <code>cat first.md</code> <code>clear</code></p>
+  
+  <div class="shell-footer">
+    <p class="shell-hint">commands: <code>help</code> <code>whoami</code> <code>ls</code> <code>cd blogs</code> <code>cat first.md</code> <code>clear</code></p>
+    
+    <form class="shell-entry" id="shell-entry" autocomplete="off">
+      <label class="shell-prompt" for="shell-input">
+        <span class="prompt">visitor@spn21</span><span class="prompt-sep">:</span><span class="cwd" id="shell-cwd">~</span><span class="prompt-mark">$</span>
+      </label>
+      <div class="input-wrapper">
+        <input class="shell-input" id="shell-input" name="command" type="text" spellcheck="false" autofocus placeholder="type 'help'" />
+        <ul class="autocomplete-list" id="autocomplete-list"></ul>
+      </div>
+    </form>
+  </div>
 </div>
 
 <script>
@@ -248,14 +253,149 @@
       event.preventDefault();
       const value = input.value;
       input.value = '';
+      autocompleteList.innerHTML = '';
+      autocompleteList.classList.remove('active');
       runCommand(value);
       focusInput();
     });
 
+    // Autocomplete functionality
+    const autocompleteList = document.getElementById('autocomplete-list');
+    let selectedIndex = -1;
+
+    function getAllCompletions() {
+      const allCommands = ['help', 'whoami', 'pwd', 'ls', 'cd', 'cat', 'clear'];
+      const allDirs = ['~', 'home', 'blogs', 'categories', '..'];
+      const allArticles = Object.keys(data.posts);
+      return {
+        commands: allCommands,
+        directories: allDirs,
+        articles: allArticles
+      };
+    }
+
+    function getCompletions(input) {
+      const completions = getAllCompletions();
+      const parts = input.trim().split(/\s+/);
+      const currentPart = parts[parts.length - 1];
+      
+      if (parts.length === 1 || input.endsWith(' ')) {
+        // Suggest commands
+        return completions.commands
+          .filter(cmd => cmd.startsWith(currentPart))
+          .slice(0, 10);
+      } else if (parts[0] === 'cd' && parts.length === 2) {
+        // Suggest directories after 'cd'
+        return completions.directories
+          .filter(dir => dir.startsWith(currentPart))
+          .slice(0, 10);
+      } else if (parts[0] === 'cat' && parts.length === 2) {
+        // Suggest articles after 'cat'
+        const suggestions = [
+          'about.txt',
+          'profile.txt',
+          ...completions.articles
+        ];
+        return suggestions
+          .filter(file => file.startsWith(currentPart))
+          .slice(0, 10);
+      }
+      
+      return [];
+    }
+
+    function updateAutocomplete() {
+      const inputValue = input.value;
+      const completions = getCompletions(inputValue);
+      selectedIndex = -1;
+
+      if (completions.length === 0) {
+        autocompleteList.innerHTML = '';
+        autocompleteList.classList.remove('active');
+        return;
+      }
+
+      autocompleteList.innerHTML = completions
+        .map((item, index) => `<li data-index="${index}">${escapeHtml(item)}</li>`)
+        .join('');
+      autocompleteList.classList.add('active');
+    }
+
+    function selectCompletion(index) {
+      const items = autocompleteList.querySelectorAll('li');
+      if (index < 0 || index >= items.length) return;
+      
+      items.forEach(item => item.classList.remove('selected'));
+      items[index].classList.add('selected');
+      selectedIndex = index;
+    }
+
+    input.addEventListener('input', updateAutocomplete);
+
+    input.addEventListener('keydown', (event) => {
+      if (!autocompleteList.classList.contains('active')) {
+        if (event.key === 'Tab') {
+          event.preventDefault();
+          updateAutocomplete();
+          if (getCompletions(input.value).length > 0) {
+            selectCompletion(0);
+          }
+        }
+        return;
+      }
+
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        selectCompletion(selectedIndex + 1);
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        selectCompletion(selectedIndex - 1);
+      } else if (event.key === 'Enter') {
+        if (selectedIndex >= 0) {
+          event.preventDefault();
+          const items = autocompleteList.querySelectorAll('li');
+          const selected = items[selectedIndex].textContent;
+          const parts = input.value.trim().split(/\s+/);
+          
+          if (parts.length === 1 || input.value.endsWith(' ')) {
+            input.value = selected + ' ';
+          } else {
+            parts[parts.length - 1] = selected;
+            input.value = parts.join(' ');
+          }
+          
+          updateAutocomplete();
+          input.focus();
+        }
+      } else if (event.key === 'Escape') {
+        autocompleteList.innerHTML = '';
+        autocompleteList.classList.remove('active');
+      } else if (event.key === 'Tab') {
+        event.preventDefault();
+        selectCompletion(selectedIndex + 1);
+      }
+    });
+
+    autocompleteList.addEventListener('click', (event) => {
+      if (event.target.tagName === 'LI') {
+        const selected = event.target.textContent;
+        const parts = input.value.trim().split(/\s+/);
+        
+        if (parts.length === 1 || input.value.endsWith(' ')) {
+          input.value = selected + ' ';
+        } else {
+          parts[parts.length - 1] = selected;
+          input.value = parts.join(' ');
+        }
+        
+        autocompleteList.innerHTML = '';
+        autocompleteList.classList.remove('active');
+        input.focus();
+      }
+    });
+
     document.getElementById('shell-app').addEventListener('click', focusInput);
 
-    runCommand('whoami');
-    runCommand('ls');
     runHashCommand();
     focusInput();
   })();

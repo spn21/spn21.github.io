@@ -134,6 +134,100 @@ video,
   border-color: var(--cli-accent);
 }
 
+.shell-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0;
+  border-top: 1px solid var(--cli-border);
+  margin-top: 24px;
+}
+
+.shell-entry {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 0 24px 24px 24px;
+}
+
+.shell-prompt {
+  display: flex;
+  gap: 0;
+  white-space: nowrap;
+  padding-top: 8px;
+}
+
+.shell-prompt span {
+  color: var(--cli-text-secondary);
+}
+
+.prompt-sep {
+  color: var(--cli-text-secondary);
+}
+
+.cwd {
+  color: var(--cli-accent);
+}
+
+.prompt-mark {
+  color: var(--cli-text-secondary);
+}
+
+.input-wrapper {
+  flex: 1;
+  position: relative;
+  min-width: 0;
+}
+
+.shell-input {
+  width: 100%;
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--cli-text-primary);
+  font-family: var(--font-main);
+  font-size: 0.95rem;
+  padding: 8px 0;
+  outline: none;
+}
+
+.shell-input::placeholder {
+  color: var(--cli-text-muted);
+}
+
+.autocomplete-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  list-style: none;
+  margin: 4px 0 0 0;
+  padding: 0;
+  background: var(--cli-panel-soft);
+  border: 1px solid var(--cli-border);
+  border-radius: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+  display: none;
+  z-index: 1000;
+}
+
+.autocomplete-list.active {
+  display: block;
+}
+
+.autocomplete-list li {
+  padding: 6px 12px;
+  color: var(--cli-text-secondary);
+  cursor: pointer;
+}
+
+.autocomplete-list li:hover,
+.autocomplete-list li.selected {
+  background: var(--cli-border-strong);
+  color: var(--cli-accent);
+}
+
 .terminal-body {
   padding: 24px;
 }
@@ -634,14 +728,21 @@ video,
 
 .shell-hint,
 .shell-redirect {
-  margin: 0;
-  color: var(--cli-text-muted);
+  margin: 12px 24px 0 24px;
+  padding: 12px;
+  color: var(--cli-text-secondary);
   font-size: 0.88rem;
+  border-left: 3px solid var(--cli-accent);
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 4px;
 }
 
 .shell-hint code,
 .shell-redirect a {
-  color: var(--cli-accent);
+  color: #00ff00;
+  background: rgba(0, 255, 0, 0.15);
+  padding: 2px 6px;
+  border-radius: 3px;
 }
 
 .shell-help {
