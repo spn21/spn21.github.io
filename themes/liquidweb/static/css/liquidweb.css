@@ -259,6 +259,59 @@ a {
   padding-bottom: 1.4rem;
 }
 
+.liquid-cli-shell {
+  display: grid;
+  gap: 1rem;
+}
+
+.liquid-cli-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  align-items: baseline;
+  font-family: "JetBrains Mono", "Fira Code", "SFMono-Regular", monospace;
+  color: var(--text-main);
+}
+
+.liquid-cli-user,
+.liquid-cli-sep,
+.liquid-cli-path,
+.liquid-cli-mark {
+  color: var(--text-soft);
+}
+
+.liquid-cli-command {
+  font-weight: 700;
+}
+
+.liquid-cli-output {
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.38);
+  padding: 1rem 1.1rem;
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(18px) saturate(145%);
+}
+
+.liquid-cli-output p {
+  margin: 0;
+  font-family: "JetBrains Mono", "Fira Code", "SFMono-Regular", monospace;
+}
+
+.liquid-cli-file {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.liquid-cli-meta {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 0.75rem;
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  font-family: "JetBrains Mono", "Fira Code", "SFMono-Regular", monospace;
+}
+
 .section-heading {
   display: flex;
   justify-content: space-between;

@@ -9,7 +9,7 @@ description = " "
 default_language = "zh"
 
 # The site theme to use.
-theme = "cli"
+theme = "liquidweb"
 
 # For overriding the default output directory `public`, set it to another value (e.g.: "docs")
 output_dir = "public"

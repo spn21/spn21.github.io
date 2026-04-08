@@ -9,15 +9,34 @@
 {% endblock description %}
 
 {% block content %}
-<article class="article-shell">
-  
+<article class="article-shell liquid-cli-shell">
+  <div class="liquid-cli-line">
+    <span class="liquid-cli-user">visitor@spn21</span>
+    <span class="liquid-cli-sep">:</span>
+    <span class="liquid-cli-path">~</span>
+    <span class="liquid-cli-mark">$</span>
+    <span class="liquid-cli-command">whoami</span>
+  </div>
+  <div class="liquid-cli-output">
+    <p>{% if page.title %}{{ page.title }}{% else %}厶月{% endif %} moumoon</p>
+  </div>
 
-  <header class="article-header">
-    <h1>{% if page.title %}{{ page.title }}{% else %}厶月{% endif %}</h1>
-  </header>
+  <div class="liquid-cli-line">
+    <span class="liquid-cli-user">visitor@spn21</span>
+    <span class="liquid-cli-sep">:</span>
+    <span class="liquid-cli-path">~</span>
+    <span class="liquid-cli-mark">$</span>
+    <span class="liquid-cli-command">cat about.txt</span>
+  </div>
 
-  <div class="article-content">
-    {{ page.content | safe }}
+  <div class="liquid-cli-output liquid-cli-file">
+    <div class="liquid-cli-meta">
+      <span>file</span>
+      <span>about.txt</span>
+    </div>
+    <div class="article-content">
+      {{ page.content | safe }}
+    </div>
   </div>
 </article>
 {% endblock content %}

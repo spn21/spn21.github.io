@@ -4,4 +4,6 @@ template = "about-page.html"
 path = "about"
 +++
 
-Terminal profile for spn21.github.io.
+Interest in arknight,love Skadi、Texas the Omertosa、Muelsyse and Ling.
+
+The Ultimate Cybersociety Phobic
