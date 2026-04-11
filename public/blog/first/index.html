@@ -1,13 +1,21 @@
 <!DOCTYPE html>
-<html lang="{{ config.default_language | default(value='en') }}">
+<html lang="zh">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}{% if config.title != "" %}{{ config.title }}{% else %}厶月{% endif %}{% endblock title %}</title>
-  <meta name="description" content="{% block description %}{% if config.description != "" %}{{ config.description }}{% else %} {% endif %}{% endblock description %}">
-  <link rel="icon" href="{{ get_url(path='favicon.svg') }}" type="image/svg+xml">
-  <link rel="shortcut icon" href="{{ get_url(path='favicon.svg') }}" type="image/svg+xml">
-  <link rel="stylesheet" href="{{ get_url(path='css/liquidweb.css') }}">
+  <title>
+My first post | 厶月
+</title>
+  <meta name="description" content="
+
+  
+经验+3
+  
+
+">
+  <link rel="icon" href="https://spn21.github.io/favicon.svg" type="image/svg+xml">
+  <link rel="shortcut icon" href="https://spn21.github.io/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="https://spn21.github.io/css/liquidweb.css">
 </head>
 <body>
   <div class="liquid-bg" aria-hidden="true">
@@ -19,27 +27,75 @@
 
   <div class="site-shell">
     <header class="site-header">
-      <a class="brand" href="{{ get_url(path='@/_index.md') }}">
+      <a class="brand" href="https://spn21.github.io/">
         <span class="brand-logo" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="none">
             <path d="M13 2.8V10h6.3L11 21.2V14H4.7L13 2.8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path>
           </svg>
         </span>
         <span class="brand-copy">
-          <strong>{% if config.title != "" %}{{ config.title }}{% else %}厶月{% endif %}</strong>
-          <small>{% if config.description != "" %}{{ config.description }}{% else %} {% endif %}</small>
+          <strong>厶月</strong>
+          <small> </small>
         </span>
       </a>
       <nav class="site-nav">
-        <a href="{{ get_url(path='@/_index.md') }}">首页</a>
-        <a href="{{ get_url(path='@/categories.md') }}">分类</a>
-        <a href="{{ get_url(path='about') }}">关于</a>
+        <a href="https://spn21.github.io/">首页</a>
+        <a href="https://spn21.github.io/blog/categories/">分类</a>
+        <a href="https://spn21.github.io/about">关于</a>
         <button class="theme-switcher" id="theme-switcher" type="button" title="切换主题">🌙</button>
       </nav>
     </header>
 
     <main class="site-main">
-      {% block content %}{% endblock content %}
+      
+
+  
+  <article class="article-page">
+    <a class="back-link" href="https://spn21.github.io/blog/categories/">返回分类列表</a>
+
+    <div class="article-layout article-layout-single">
+      
+
+      <div class="article-shell article-main">
+        
+          <figure class="article-cover-wrap">
+            <img class="article-cover" src="&#x2F;covers&#x2F;first.jpg" alt="My first post">
+            
+              <figcaption class="article-cover-sentence">经验+3</figcaption>
+            
+            
+              <div class="post-tags article-tags">
+                
+                  <span class="post-tag">General</span>
+                
+                  <span class="post-tag">hello</span>
+                
+                  <span class="post-tag">note</span>
+                
+              </div>
+            
+          </figure>
+        
+
+        <header class="article-header">
+          <p class="article-meta">
+            2025-01-01
+            
+              <span>1 分钟阅读</span>
+            
+          </p>
+          <h1>My first post</h1>
+        </header>
+
+        <div class="article-content">
+          <p>Hello World!</p>
+
+        </div>
+      </div>
+    </div>
+  </article>
+
+
     </main>
 
     <a id="back-to-top" href="#" title="返回顶部" aria-label="返回顶部">↑</a>

@@ -5,7 +5,7 @@ date = 2026-03-10
 [extra]
 cover_image = "/covers/7.jpg"
 cover_sentence = ""
-tags = ["learing", "rust", "note"]
+tags = ["Learing", "Rust", "Note"]
 draft = true
 +++
 
