@@ -14,7 +14,7 @@ draft = false
 
 v4版本相较于v3,主要引入了4个功能:
 
-### 1.Hooks
+## 1.Hooks
 
 在uniswapv4中,每个流动池不再对应一个合约，而是所有池子都在一个合约下(PoolKey作为Pool的唯一ID),以下是官方给出创建流动池的例子
 
@@ -147,7 +147,7 @@ contract SampleHook is BaseHook  {
 
 ```getHookPermission```func必须重载,可以实现上面所说的五个功能，把对应的功能(如```beforeAddLiquidity```)设置为true即可.
 
-### 2.Singleton
+## 2.Singleton
 
 先前的Uniswap版本使用factor/pool模式进行代币部署,Uniswapv4使用singleton设计模式,所有资金池由一个合约管理,使池子到部署成本降低99%.
 
@@ -162,18 +162,18 @@ contract SampleHook is BaseHook  {
 
 *** 仅执行一次余额更新，而不是为每个池单独修改余额 ***
 
-### 3.Flash accounting
+## 3.Flash accounting
 
 
 两者加上hook,可以增加pool的数量
 
-### 4.Native ETH
+## 4.Native ETH
 
 Uniswapv4允许同时支持WETH和ETH配对.原生ETH转账的gas成本大约是ERC-20转账的一半(ETH的gas成本为21k,而ERC-20为约40k).
 
 同时,引入hook之后,```PoolManager```不需要Price Oracle进行数据存储和逻辑处理,Oracle可以通过hook合约.
 
-### 5.Custom Accounting
+## 5.Custom Accounting
 
 Hooks without Custom Accounting:
 
