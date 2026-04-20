@@ -16,60 +16,109 @@
 {% endif %}
 {% endblock description %}
 
-{% block content %}
+{% block site_layout_class %}
+{% if page.extra.draft is defined and page.extra.draft == false and page.toc is defined and page.toc | length > 0 %} site-layout-with-sidebar{% endif %}
+{% endblock site_layout_class %}
+
+{% block page_sidebar %}
 {% if page.extra.draft is defined and page.extra.draft == false %}
   {% set has_toc = page.toc is defined and page.toc | length > 0 %}
-  <article class="article-page">
-    <a class="back-link" href="{{ get_url(path='@/categories.md') }}">返回分类列表</a>
+  {% if has_toc %}
+    <aside class="page-sidebar article-toc" aria-label="文章目录">
+      <nav class="article-toc-nav">
+        <ul class="article-toc-list">
+          {% for header in page.toc %}
+            <li class="article-toc-item">
+              <a class="article-toc-link{% if header.children is defined and header.children | length > 0 %} article-toc-link-parent{% endif %}" href="#{{ header.id }}">
+                <span class="article-toc-link-text">{{ header.title }}</span>
+                {% if header.children is defined and header.children | length > 0 %}
+                  <span class="article-toc-link-caret" aria-hidden="true">v</span>
+                {% endif %}
+              </a>
+              {% if header.children is defined and header.children | length > 0 %}
+                <ul class="article-toc-sublist">
+                  {% for child in header.children %}
+                    <li class="article-toc-subitem">
+                      <a class="article-toc-sublink" href="#{{ child.id }}">
+                        <span class="article-toc-sublink-text">{{ child.title }}</span>
+                      </a>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </nav>
+    </aside>
+    <div class="mobile-toc-backdrop" id="mobile-toc-backdrop" hidden></div>
+    <div class="mobile-toc-panel" id="mobile-toc-panel" hidden aria-label="移动端文章目录">
+      <div class="mobile-toc-sheet">
+        <p class="mobile-toc-title">文章目录</p>
+        <nav class="article-toc-nav">
+          <ul class="article-toc-list">
+            {% for header in page.toc %}
+              <li class="article-toc-item">
+                <a class="article-toc-link{% if header.children is defined and header.children | length > 0 %} article-toc-link-parent{% endif %}" href="#{{ header.id }}">
+                  <span class="article-toc-link-text">{{ header.title }}</span>
+                  {% if header.children is defined and header.children | length > 0 %}
+                    <span class="article-toc-link-caret" aria-hidden="true">v</span>
+                  {% endif %}
+                </a>
+                {% if header.children is defined and header.children | length > 0 %}
+                  <ul class="article-toc-sublist">
+                    {% for child in header.children %}
+                      <li class="article-toc-subitem">
+                        <a class="article-toc-sublink" href="#{{ child.id }}">
+                          <span class="article-toc-sublink-text">{{ child.title }}</span>
+                        </a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </nav>
+      </div>
+    </div>
+  {% endif %}
+{% endif %}
+{% endblock page_sidebar %}
 
-    <div class="article-layout{% if not has_toc %} article-layout-single{% endif %}">
-      {% if has_toc %}
-        <aside class="article-toc" aria-label="文章目录">
-          <div class="article-toc-head">
-            <p>文章目录</p>
-          </div>
-          <nav class="article-toc-nav">
-            <ul class="article-toc-list">
-              {% for header in page.toc %}
-                <li class="article-toc-item">
-                  <a class="article-toc-link" href="#{{ header.id }}">{{ header.title }}</a>
-                </li>
+{% block content %}
+{% if page.extra.draft is defined and page.extra.draft == false %}
+  <article class="article-page">
+    <div class="article-shell article-main">
+      <a class="back-link" href="{{ get_url(path='@/categories.md') }}">返回分类列表</a>
+      {% if page.extra.cover_image is defined and page.extra.cover_image != "" %}
+        <figure class="article-cover-wrap">
+          <img class="article-cover" src="{{ page.extra.cover_image }}" alt="{% if page.title %}{{ page.title }}{% else %}文章封面{% endif %}">
+          {% if page.extra.cover_sentence is defined and page.extra.cover_sentence != "" %}
+            <figcaption class="article-cover-sentence">{{ page.extra.cover_sentence }}</figcaption>
+          {% endif %}
+          {% if page.extra.tags is defined and page.extra.tags | length > 0 %}
+            <div class="post-tags article-tags">
+              {% for tag in page.extra.tags %}
+                <span class="post-tag">{{ tag }}</span>
               {% endfor %}
-            </ul>
-          </nav>
-        </aside>
+            </div>
+          {% endif %}
+        </figure>
       {% endif %}
 
-      <div class="article-shell article-main">
-        {% if page.extra.cover_image is defined and page.extra.cover_image != "" %}
-          <figure class="article-cover-wrap">
-            <img class="article-cover" src="{{ page.extra.cover_image }}" alt="{% if page.title %}{{ page.title }}{% else %}文章封面{% endif %}">
-            {% if page.extra.cover_sentence is defined and page.extra.cover_sentence != "" %}
-              <figcaption class="article-cover-sentence">{{ page.extra.cover_sentence }}</figcaption>
-            {% endif %}
-            {% if page.extra.tags is defined and page.extra.tags | length > 0 %}
-              <div class="post-tags article-tags">
-                {% for tag in page.extra.tags %}
-                  <span class="post-tag">{{ tag }}</span>
-                {% endfor %}
-              </div>
-            {% endif %}
-          </figure>
-        {% endif %}
+      <header class="article-header">
+        <p class="article-meta">
+          {% if page.date %}{{ page.date }}{% else %}未标注日期{% endif %}
+          {% if page.reading_time %}
+            <span>{{ page.reading_time }} 分钟阅读</span>
+          {% endif %}
+        </p>
+        <h1>{% if page.title %}{{ page.title }}{% else %}未命名文章{% endif %}</h1>
+      </header>
 
-        <header class="article-header">
-          <p class="article-meta">
-            {% if page.date %}{{ page.date }}{% else %}未标注日期{% endif %}
-            {% if page.reading_time %}
-              <span>{{ page.reading_time }} 分钟阅读</span>
-            {% endif %}
-          </p>
-          <h1>{% if page.title %}{{ page.title }}{% else %}未命名文章{% endif %}</h1>
-        </header>
-
-        <div class="article-content">
-          {{ page.content | safe }}
-        </div>
+      <div class="article-content">
+        {{ page.content | safe }}
       </div>
     </div>
   </article>

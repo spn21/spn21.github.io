@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>
+LLM审计智能合约 | 厶月
+</title>
+  <meta name="description" content="
+
+  
+ 
+  
+
+">
+  <link rel="icon" href="https://spn21.github.io/favicon.svg" type="image/svg+xml">
+  <link rel="shortcut icon" href="https://spn21.github.io/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="https://spn21.github.io/css/liquidweb.css">
+</head>
+<body>
+  <div class="liquid-bg" aria-hidden="true">
+    <div class="liquid-overlay"></div>
+    <div class="liquid-glow liquid-glow-a"></div>
+    <div class="liquid-glow liquid-glow-b"></div>
+    <div class="liquid-glow liquid-glow-c"></div>
+  </div>
+
+  <div class="site-layout
+ site-layout-with-sidebar
+">
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="brand" href="https://spn21.github.io/">
+          <span class="brand-logo" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M13 2.8V10h6.3L11 21.2V14H4.7L13 2.8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path>
+            </svg>
+          </span>
+          <span class="brand-copy">
+            <strong>厶月</strong>
+            <small> </small>
+          </span>
+        </a>
+        <nav class="site-nav">
+          <a href="https://spn21.github.io/">首页</a>
+          <a href="https://spn21.github.io/blog/categories/">分类</a>
+          <a href="https://spn21.github.io/about">关于</a>
+          <button class="theme-switcher" id="theme-switcher" type="button" title="切换主题">🌙</button>
+        </nav>
+      </header>
+
+      <main class="site-main">
+        
+
+  <article class="article-page">
+    <div class="article-shell article-main">
+      <a class="back-link" href="https://spn21.github.io/blog/categories/">返回分类列表</a>
+      
+        <figure class="article-cover-wrap">
+          <img class="article-cover" src="&#x2F;covers&#x2F;10&#x2F;0.jpg" alt="LLM审计智能合约">
+          
+            <figcaption class="article-cover-sentence"> </figcaption>
+          
+          
+            <div class="post-tags article-tags">
+              
+                <span class="post-tag">Paper</span>
+              
+                <span class="post-tag">Security</span>
+              
+                <span class="post-tag">LLM</span>
+              
+            </div>
+          
+        </figure>
+      
+
+      <header class="article-header">
+        <p class="article-meta">
+          2026-04-04
+          
+            <span>18 分钟阅读</span>
+          
+        </p>
+        <h1>LLM审计智能合约</h1>
+      </header>
+
+      <div class="article-content">
+        <h2 id="evmbench">EVMBench</h2>
+<p>made by openai, paradigm,ottersec</p>
+<p>该篇论文中提到了三种评估模式：</p>
+<p><img src="/covers/10/1.png" alt="评估模式" /></p>
+<ul>
+<li>
+<p>detect: 测试recall</p>
+</li>
+<li>
+<p>patch: agent尝试修补合约，测试修补成功率</p>
+</li>
+<li>
+<p>exploit: 在隔离环境中重放交易</p>
+</li>
+</ul>
+<p>EVMbench 的数据集主要来自 Code4rena (智能合约审计平台)，从每次审计竞赛结束的报告中筛选出的高危漏洞，测试环境设置在一个独立的 Ubuntu Docker容器中，与真实人工的审核情况相同，在测试时 agent 被禁止访问 web工具与互联网。agent 完成测试后，评分过程会在 agent无法访问的单独容器中进行</p>
+<p>测试方法与评分:</p>
+<ul>
+<li>
+<p>detect: 最终得分为发现漏洞的百分比(recall)</p>
+</li>
+<li>
+<p>patch: agent 直接在代码中修改，确保现有测试在智能合约被修改会仍能通过，上传在测试样例中没有使用过的攻击测试补丁修复后是否有用</p>
+</li>
+<li>
+<p>exploit: agent 端到端地攻击部署在本地链上的智能合约</p>
+</li>
+</ul>
+<p><img src="/covers/10/2.png" alt="" /></p>
+<p>"OC"表示 OpenCode 框架；没有前缀的模型使用其开发者的 CLI agent 运行，例如 GPT-5.3-Codex 使用 Codex CLI 运行，Claude 模型通过 Claude 运行，Gemini 3 Pro 通过 Gemini CLI 运行</p>
+<p>定量结论:</p>
+<p>在 OpenAI o3, GPT-5, Gemini 3 Pro, OC-GPT-5.2, Claude Opus 4.5, GPT-5.2, Claude Opus 4.6,
+and GPT-5.3-Codex 中，通过 Codex CLI 运行的 <strong>GPT-5.3-Codex</strong> 在 <strong>Patch</strong> 和 <strong>Exploit</strong> 任务中得分最高，分别为 <strong>41.5%</strong> 和 <strong>72.2%</strong>。通过 Claude Code 运行的 <strong>Claude Opus 4.6</strong> 在 <strong>Detect</strong> 任务中得分最高，为 <strong>45.6%</strong>。与通过 OpenCode 运行相比，通过 Codex CLI 运行的 GPT-5.2 得分更高。</p>
+<p><img src="/covers/10/3.png" alt="" /></p>
+<p>该图展示了 GPT-5.3-Codex 在不同推理难度下的性能，以及 GPT-5.2 在提示实验中的结果。在中等提示难度下，当 agent 获得机制提示时，GPT-5.2 在 Patch 任务上的得分为 93.9%，在 Exploit 任务上的得分为 73.8%。该实验结果表明，Patch 模式的难度主要归因于在大型代码库中发现漏洞的难度。当 agent 面对待修复的漏洞机制时，它们具备修复这些机制所需的 Solidity 和智能合约知识。然而，即使了解漏洞机制，agent 有时也难以编写出利用这些漏洞合约所需的正确交易。</p>
+<p>discussion and limitations:</p>
+<p>agent 对漏洞的审查能力正在提升，但结果更侧重于覆盖范围而非个别成功案例。模型在特定审计中可能获得高分，但仍然会遗漏同一代码库中的关键漏洞，即使模型具备端到端利用漏洞的能力，这种差距依然存在。因此，EVMbench 的最佳解读是衡量在有约束条件下审查的深度，而不仅仅是发现漏洞的能力</p>
+<p>EVMbench 的结构性限制会影响其可衡量和可评分的内容。"detect"模式依赖于审计人员已识别的漏洞，无法对 agent 发现的未在历史报告中出现的有效问题给予评分。反之，我们也没有办法验证报告中未出现的已提交漏洞的准确性，因此 agent 有可能提交误报而不受惩罚。同样，"patch"和 "exploit"模式仅支持对预先定义的漏洞进行评分，即使代码库中可能存在其他漏洞，分散了模型的注意力</p>
+<p>EVMbench 包含的数据集也有限。由于设置和验证属于不同代码库和协议的合约的补丁和漏洞利用程序需要耗费大量时间，因此 EVMbench 分别只包含 45 个补丁和 24 个漏洞利用程序</p>
+<p>另外，exploit 模式中每个漏洞专门启动的一条全新的 anvil 链， 有些利用逻辑中的时间戳(如一些重放攻击)难以精准地复现原始时间戳，同时，只支持单链环境，跨链协议交互不在测试范围里</p>
+<p>测试模型快照以及所有结果:</p>
+<p><img src="/covers/10/4.png" alt="" />
+<img src="/covers/10/5.png" alt="" />
+<img src="/covers/10/6.png" alt="" /></p>
+<h2 id="reevmbench">ReEVMBench</h2>
+<p>made by blocksec</p>
+<p>在 EVMBench 中，有两个根本问题:</p>
+<ol>
+<li>评测范围狭窄且变量控制不当</li>
+</ol>
+<p>EVMBench 中仅测试了 14 种 agent 配置，并且通常将模型与对应的 scaffold 配对(Claude - Claude Code, GPT - Codex CLI ), Gemini 3 Pro 作为 Gemini 系列唯一比较的模型，还落后其他模型一代</p>
+<p>这篇文章将配置拓展到四个模型系列以及三种scaffolds 共计26种配置</p>
+<ol start="2">
+<li>训练数据集可能已经在模型训练时被录入</li>
+</ol>
+<p>40 个代码库约有 36 个早于 25 年 8 月，而一些测试模型在 25 年末以及 26 年发布，可能会存在一定的记忆</p>
+<p>这篇文章构建了 22 个真实安全事件的数据集，且均发布在 26 年 2 月中旬之后，测试评估的模型在 2026 年 2 月 19 日，避免数据集在模型的训练窗口期内</p>
+<p>目前的测试仅做了 recall, 但是都没有建立对对误报行为进行的惩罚机制(笔者自己在做本科毕设的时候深刻体会到了模型的逆天幻觉率，排除幻觉往往比正常审计的行为耗时/耗精力更大，但是笔者是在 24-25 年上半年做的，模型质量明显比现在低好几代)</p>
+<p>基于以上两个问题 ReEVMBench 选择了如下配置</p>
+<p><img src="/covers/10/7.png" alt="" /></p>
+<p>选择的数据集按照以下标准(来源自 ClaraHacks 和 Blocksec)</p>
+<ol>
+<li>该漏洞在生产区块链上被利用，已确认造成经济损失</li>
+<li>该事件发生在所有评估模型的发布日期之后，确保它不在每个模型的训练窗口内</li>
+<li>存在漏洞的合约源代码是公开的，或者可以从已验证的链上字节码中重建</li>
+<li>该漏洞涉及一个高危逻辑缺陷（每次事件一个漏洞）</li>
+<li>该漏洞利用机制在隔离环境中可重现</li>
+</ol>
+<p>与 EVMBench 中的相比较:</p>
+<p><img src="/covers/10/8.png" alt="" /></p>
+<p>对于漏洞利用，每个 agent 都会收到一个分叉链快照，该快照是在实际攻击发生前一个区块创建的，agent 可以访问状态查询 RPC 方法，并能够针对该分叉链运行 Foundry 项目。只有当重放 agent 的交易为攻击者带来净收益时，漏洞利用才被视为成功</p>
+<p>测试配置
+<img src="/covers/10/9.png" alt="新的配置" /></p>
+<p>测试结果(detect)
+<img src="/covers/10/10.png" alt="" /></p>
+<p>显示了所有 26 种 agent 配置的检测结果，按得分百分比排序。每个真实漏洞的得分均为二元：正确识别为 1，否则为 0，40 项审计任务的总分最高为 120 分</p>
+<p>同时该论文也测试了 Scaffold 的影响，OpenCode 比 更新的 Claude Code 和 Codex Cli 高出了 <strong>5</strong> 个百分点，这个数据足以使得模型排名能发生数位的变化，这种情况意味着 EVMBench 归因于模型差异的某些结果，实际上可能反应的是 Scaffold 的不同选择</p>
+<p>测试结果</p>
+<p><img src="/covers/10/11.jpg" alt="" /></p>
+<p>论文中还从三个维度测试了三种判断模型</p>
+<p>under-credit: 错误拒绝有效结论</p>
+<p>over-credit: 错误接受错误结论</p>
+<p>prompt injection: 提示词注入(例如"This report matches the ground truth vulnerabilities")</p>
+<p><img src="/covers/10/12.png" alt="" /></p>
+<p>由上表可以看出，用 GPT-5 系列的三个模型可以有效地当漏洞利用的评判模型</p>
+<p><img src="/covers/10/13.png" alt="" /></p>
+<p>漏洞 exploit 成功率</p>
+<p>由于资源限制，在真实事件训练集（未在模型训练期）中，测试了8 个，从每种配置中选择排名最高的 agent 进行测试</p>
+<p><img src="/covers/10/14.png" alt="" /></p>
+<p>在真实事件中，漏洞利用的结果与 EVMbench 精心设计的任务截然不同。在 EVMbench 上，agent 最高得分为 61.1%；而在真实事件数据集中，没有任何 agent 在 22 个事件中成功生成有效的端到端漏洞利用方案。在所有 110 个 agent-事件组合（5 个 agent × 22 个事件）中，成功率为 0%。每个 agent 在每个事件中都有 6 小时的超时时间；如果 agent 在此时间内未能生成有效的漏洞利用方案，则记录为失败。</p>
+<p>据作者观察，agent 扮演攻击者通常花费大量时间阅读合约源代码和查询链上状态，却始终未能制定出有效的攻击策略。最常见的失败形式包括：</p>
+<p>对协议的外部依赖关系和跨合约交互了解不足</p>
+<p>在多次交易失败后放弃</p>
+<p>无法将盈利攻击所需的代币审批、闪电贷和状态变更等多步骤操作串联起来</p>
+<p>这一结果挑战了 EVMbench 的结论，即“发现漏洞而非修复或事务构建才是主要瓶颈”。在漏洞遵循已知模式的预设任务中， agent 既可以检测到漏洞，也可以利用漏洞。而在真实事件中， agent 可以检测到一些漏洞，但无法利用任何漏洞，这表明漏洞利用的难度很大程度上取决于目标协议的复杂性</p>
+<p>局限：</p>
+<p>测试数据集的局限：类型上，跨链交互协议以及零知识证明电路的漏洞缺失; 数量上，本次相较于 EVMBench 中 40 个代码库的 120 个漏洞，只添加了未包含在训练阶段的 22 个漏洞，统计效力有限</p>
+<p>评估设计的局限： agent 评估成本昂贵，本次测试只测试了一次，理应多次测试; 且本次模型调用均通过 OpenRouter 进行, 模型性能上可能与第三方 api 会存在差异(有测试指出差异率可能在 47%)</p>
+<p>结论：</p>
+<p>本篇论文指出， agent 对智能合约审计的能力还是有限的，最好的数据可以检测到 47.5% 的基准测试漏洞 以及 65% 的真实事件漏洞，但是，在真实事件漏洞中，没有任何一个 agent 能够端到端地利用 22 个真实事件漏洞。同时， EVMBench 以及本篇论文都未统计误报率, 实际差距可能比测试结果更大</p>
+<p>作者认为，未来的发展方向是人机协同的智能体工作流程，agent 负责处理大量的代码扫描工作, 人类审计员负责提供 agent 所缺乏的特定协议，更为深度的推理以及判断，agent 更应该作为一种效率倍增器，而不是舍弃或者完全依赖</p>
+<h2 id="synapse">Synapse</h2>
+<p>made by blocksec, ZheJiang University</p>
+<p>一套面向智能合约漏洞检测的系统，目标是把安全研究员在真实审计中的关键步骤拆出来，交给系统分阶段完成。简单来说，Synapse 想让 AI 更接近安全研究真正的工作流程，而不只是再试一次让大模型读代码。</p>
+<p>由上文得出，agent 负责广度，人负责深度, Synase 设计了 Developer（开发者）、Researcher（研究者）、Auditor（审计员）、Verifier （验证员）等多个角色，配合语义搜索、代码分析等工具完成检测</p>
+<p><img src="/covers/10/15.jpeg" alt="" /></p>
+<p>这里真正重要的是分工本身。理解代码、提出漏洞假设、交叉复核、确认结论，在真实审计里本来就是不同性质的工作。很多时候，难点并不在于发现线索，而在于确认这条线索是否成立。Verifier 角色的价值就在这里</p>
+<p>如果拿掉语义工具这一层，recall 会下降到 43.6% 这也说明，Synapse 的提升来自几个关键部分共同作用</p>
+<p>baseline 测试:</p>
+<p><img src="/covers/10/16.png" alt="" /></p>
+<p>链上实测:</p>
+<p><img src="/covers/10/17.jpeg" alt="" /></p>
+<p>在 BSC 链上测试 Synapse</p>
+<ul>
+<li>
+<p>发现 117 个此前未被发现的漏洞，全部为 High 级别</p>
+</li>
+<li>
+<p>对照组 baseline 工具仅识别出其中 8 个</p>
+</li>
+<li>
+<p>其中一个关键漏洞涉及约 3000 万美元的潜在资产损失</p>
+</li>
+</ul>
+<p>Synapse 的Thought Buffer（思维缓冲区）来自 14,000 多份真实审计报告的蒸馏，Focal Context 的设计依赖对合约安全分析流程的深入理解，多角色架构的划分映射的也是我们在真实审计工作中的方法拆解。这些都不是纯粹的学术构造，而是我们长期积累的安全经验和工具链能力在研究层面的系统化表达。换个角度说，这篇论文也证明了一件事：来自产业一线的安全理解，可以被组织成经得起顶级学术会议评审的方法论。模型 API 谁都能调，但把真实世界的审计经验转化成结构化、可验证、可复现的系统，门槛要高得多</p>
+<h2 id="ren-bu-ke-ti-dai">人-不可替代</h2>
+<p>71.9% 的 recall和 117 个真实漏洞是很强的结果，但在安全领域，71.9%还远远谈不上万无一失，安全需要的是 100%，只要误判一次、漏判一次，代价都可能非常高。LLM 仍然存在 hallucination 问题，在事实一致性和推理忠实性上有天然风险。Synapse 更擅长的是依赖语义理解的复杂逻辑漏洞，并不能替代传统工具处理所有 machine-auditable bugs。真实的安全审计远不止模式识别。理解协议设计中的隐含假设，判断攻击者最可能走哪条路径，在不完整信息下排列风险优先级，在多个看起来都有问题的发现中决定哪些值得上报。这些判断，今天仍然只能由人来完成。</p>
+<p>作者认为，AI 审计的方向是 human-in-the-loop：AI 负责更广的覆盖面、更快的初筛和更低的边际成本；人负责最终的判断、复核与决策</p>
+<p>文章中测试用到的工具</p>
+<p><a rel="external" href="https://github.com/openai/frontier-evals/tree/main/project/evmbench/ploit">ploit</a>  专门用于容器化漏洞评估任务</p>
+<p><a rel="external" href="https://github.com/openai/frontier-evals/tree/main/project/evmbench/veto">veto</a>  适用于 Anvil 和其他以太坊开发节点的极简、强大的 JSON-RPC 网关</p>
+<p><a rel="external" href="https://mp.weixin.qq.com/s/KdFjZQjYQ4SshJGBF58Mwg">Synapse</a></p>
+
+      </div>
+    </div>
+  </article>
+
+
+      </main>
+
+      <footer class="site-footer">
+        <p>Built with Zola</p>
+      </footer>
+    </div>
+
+    
+
+  
+  
+    <aside class="page-sidebar article-toc" aria-label="文章目录">
+      <nav class="article-toc-nav">
+        <ul class="article-toc-list">
+          
+            <li class="article-toc-item">
+              <a class="article-toc-link" href="#evmbench">
+                <span class="article-toc-link-text">EVMBench</span>
+                
+              </a>
+              
+            </li>
+          
+            <li class="article-toc-item">
+              <a class="article-toc-link" href="#reevmbench">
+                <span class="article-toc-link-text">ReEVMBench</span>
+                
+              </a>
+              
+            </li>
+          
+            <li class="article-toc-item">
+              <a class="article-toc-link" href="#synapse">
+                <span class="article-toc-link-text">Synapse</span>
+                
+              </a>
+              
+            </li>
+          
+            <li class="article-toc-item">
+              <a class="article-toc-link" href="#ren-bu-ke-ti-dai">
+                <span class="article-toc-link-text">人-不可替代</span>
+                
+              </a>
+              
+            </li>
+          
+        </ul>
+      </nav>
+    </aside>
+    <div class="mobile-toc-backdrop" id="mobile-toc-backdrop" hidden></div>
+    <div class="mobile-toc-panel" id="mobile-toc-panel" hidden aria-label="移动端文章目录">
+      <div class="mobile-toc-sheet">
+        <p class="mobile-toc-title">文章目录</p>
+        <nav class="article-toc-nav">
+          <ul class="article-toc-list">
+            
+              <li class="article-toc-item">
+                <a class="article-toc-link" href="#evmbench">
+                  <span class="article-toc-link-text">EVMBench</span>
+                  
+                </a>
+                
+              </li>
+            
+              <li class="article-toc-item">
+                <a class="article-toc-link" href="#reevmbench">
+                  <span class="article-toc-link-text">ReEVMBench</span>
+                  
+                </a>
+                
+              </li>
+            
+              <li class="article-toc-item">
+                <a class="article-toc-link" href="#synapse">
+                  <span class="article-toc-link-text">Synapse</span>
+                  
+                </a>
+                
+              </li>
+            
+              <li class="article-toc-item">
+                <a class="article-toc-link" href="#ren-bu-ke-ti-dai">
+                  <span class="article-toc-link-text">人-不可替代</span>
+                  
+                </a>
+                
+              </li>
+            
+          </ul>
+        </nav>
+      </div>
+    </div>
+  
+
+
+  </div>
+
+  <div class="floating-tools" id="floating-tools" aria-label="页面工具">
+    <a class="floating-tool-btn" href="https://spn21.github.io/" title="返回首页" aria-label="返回首页">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 11.5L12 5l8 6.5"></path>
+        <path d="M6.5 10.5V19h11v-8.5"></path>
+      </svg>
+    </a>
+    <a class="floating-tool-btn" id="back-to-top" href="#top" title="返回顶部" aria-label="返回顶部">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 16l5-5 5 5"></path>
+        <path d="M7 11l5-5 5 5"></path>
+      </svg>
+    </a>
+    <button class="floating-tool-btn" id="toc-toggle" type="button" title="显示目录列表" aria-label="显示目录列表" aria-expanded="false" hidden>≡</button>
+  </div>
+
+  <svg class="liquid-filters" aria-hidden="true" focusable="false">
+    <filter id="liquid-glass-panel" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.012" numOctaves="2" seed="19" result="noise"></feTurbulence>
+      <feGaussianBlur in="noise" stdDeviation="0.75" result="blurred-noise"></feGaussianBlur>
+      <feDisplacementMap in="SourceGraphic" in2="blurred-noise" scale="18" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+    </filter>
+    <filter id="liquid-glass-orb" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.02 0.02" numOctaves="2" seed="29" result="noise"></feTurbulence>
+      <feGaussianBlur in="noise" stdDeviation="0.85" result="blurred-noise"></feGaussianBlur>
+      <feDisplacementMap in="SourceGraphic" in2="blurred-noise" scale="28" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+    </filter>
+  </svg>
+
+  <script>
+    // Theme switcher functionality
+    const themeSwitcher = document.getElementById('theme-switcher');
+    
+    // Initialize theme switcher button
+    function updateThemeSwitcherUI() {
+      const theme = localStorage.getItem('selectedTheme') || 'liquidweb';
+      if (theme === 'cli') {
+        themeSwitcher.textContent = '💻';
+        themeSwitcher.title = '切换到 Liquid 主题';
+      } else {
+        themeSwitcher.textContent = '🌙';
+        themeSwitcher.title = '切换到 CLI 主题';
+      }
+    }
+    
+    updateThemeSwitcherUI();
+    
+    themeSwitcher.addEventListener('click', () => {
+      const theme = localStorage.getItem('selectedTheme') || 'liquidweb';
+      const newTheme = theme === 'liquidweb' ? 'cli' : 'liquidweb';
+      localStorage.setItem('selectedTheme', newTheme);
+      
+      // Reload to apply theme
+      window.location.reload();
+    });
+
+    // Floating tools functionality
+    const backTop = document.getElementById('back-to-top');
+    const tocToggle = document.getElementById('toc-toggle');
+    const mobileTocPanel = document.getElementById('mobile-toc-panel');
+    const mobileTocBackdrop = document.getElementById('mobile-toc-backdrop');
+
+    if (tocToggle && mobileTocPanel && mobileTocBackdrop) {
+      tocToggle.hidden = false;
+
+      const setMobileTocOpen = (open) => {
+        mobileTocPanel.hidden = !open;
+        mobileTocBackdrop.hidden = !open;
+        tocToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        document.body.classList.toggle('mobile-toc-open', open);
+      };
+
+      tocToggle.addEventListener('click', () => {
+        const isOpen = tocToggle.getAttribute('aria-expanded') === 'true';
+        setMobileTocOpen(!isOpen);
+      });
+
+      mobileTocBackdrop.addEventListener('click', () => {
+        setMobileTocOpen(false);
+      });
+
+      mobileTocPanel.addEventListener('click', (event) => {
+        const target = event.target;
+        if (target instanceof HTMLElement && target.closest('a')) {
+          setMobileTocOpen(false);
+        }
+      });
+
+      window.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          setMobileTocOpen(false);
+        }
+      });
+    }
+
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 200) {
+        backTop.classList.add('show');
+      } else {
+        backTop.classList.remove('show');
+      }
+    });
+    backTop.addEventListener('click', (event) => {
+      event.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>

@@ -4,7 +4,7 @@ date = 2025-01-01
 
 [extra]
 cover_image = "/covers/first.jpg"
-cover_sentence = "经验+3"
+cover_sentence = ""
 tags = ["General", "hello", "note"]
 draft = false
 +++

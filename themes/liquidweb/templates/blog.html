@@ -4,10 +4,10 @@
 {% set blog_section = get_section(path="blog/_index.md") %}
 
 
-<section class="posts-section" id="categories">
-  <div class="section-heading">
+<section class="posts-section posts-section-plain category-directory" id="categories">
+  <div class="section-heading category-directory-head">
     <h2>分类</h2>
-    <p></p>
+    <p>按主题整理所有已公开文章</p>
   </div>
 
   {% if blog_section.pages | length > 0 %}
@@ -32,23 +32,23 @@
         {% endfor %}
 
         {% if visible_count > 0 %}
-          <div class="category-block">
-            <div class="category-head">
-              <h3>{{ category }}</h3>
-              <span>{{ visible_count }} 篇</span>
+          <section class="category-group">
+            <div class="category-group-head">
+              <span class="category-group-dot" aria-hidden="true"></span>
+              <h3 class="category-group-title">{{ category }}</h3>
+              <span class="category-group-count">一共写了 {{ visible_count }} 篇</span>
             </div>
 
-            <div class="category-post-list">
+            <div class="category-post-stream">
               {% for page in sorted_pages %}
                 {% if page.extra.draft is defined and page.extra.draft == false %}
-                  <article class="category-post-item">
-                    <h4 class="category-post-title">
-                      <a href="{{ page.permalink | safe }}">
+                  <article class="category-post-row">
+                    <a class="category-post-link" href="{{ page.permalink | safe }}">
+                      <h4 class="category-post-title">
                         {% if page.title %}{{ page.title }}{% else %}{{ page.slug }}{% endif %}
-                      </a>
-                    </h4>
+                      </h4>
+                    </a>
                     <div class="category-post-meta">
-                      <span class="category-post-date">{% if page.date %}{{ page.date }}{% else %}未标注日期{% endif %}</span>
                       {% if page.extra.tags is defined and page.extra.tags | length > 0 %}
                         <div class="category-tag-cloud">
                           {% for tag in page.extra.tags %}
@@ -62,12 +62,13 @@
                           {% endfor %}
                         </div>
                       {% endif %}
+                      <span class="category-post-date">{% if page.date %}{{ page.date }}{% else %}未标注日期{% endif %}</span>
                     </div>
                   </article>
                 {% endif %}
               {% endfor %}
             </div>
-          </div>
+          </section>
         {% endif %}
       {% endfor %}
     {% else %}

@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>
+UniswapV4 Learning | 厶月
+</title>
+  <meta name="description" content="
+
+  
+
+v4版本相较于v3,主要引入了4个功能:
+1.Hooks
+在uniswapv4中,每个流动池不再对应一个合约，而是所有池子都在一个合约下(PoolKey作为Pool的唯一ID),以下是官方给出创建流动池的例子
+
+&#x2F;&#x2F; SPDX-License-Identifier: MIT
+p…
+  
+
+">
+  <link rel="icon" href="https://spn21.github.io/favicon.svg" type="image/svg+xml">
+  <link rel="shortcut icon" href="https://spn21.github.io/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="https://spn21.github.io/css/liquidweb.css">
+</head>
+<body>
+  <div class="liquid-bg" aria-hidden="true">
+    <div class="liquid-overlay"></div>
+    <div class="liquid-glow liquid-glow-a"></div>
+    <div class="liquid-glow liquid-glow-b"></div>
+    <div class="liquid-glow liquid-glow-c"></div>
+  </div>
+
+  <div class="site-layout
+ site-layout-with-sidebar
+">
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="brand" href="https://spn21.github.io/">
+          <span class="brand-logo" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M13 2.8V10h6.3L11 21.2V14H4.7L13 2.8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path>
+            </svg>
+          </span>
+          <span class="brand-copy">
+            <strong>厶月</strong>
+            <small> </small>
+          </span>
+        </a>
+        <nav class="site-nav">
+          <a href="https://spn21.github.io/">首页</a>
+          <a href="https://spn21.github.io/blog/categories/">分类</a>
+          <a href="https://spn21.github.io/about">关于</a>
+          <button class="theme-switcher" id="theme-switcher" type="button" title="切换主题">🌙</button>
+        </nav>
+      </header>
+
+      <main class="site-main">
+        
+
+  <article class="article-page">
+    <div class="article-shell article-main">
+      <a class="back-link" href="https://spn21.github.io/blog/categories/">返回分类列表</a>
+      
+        <figure class="article-cover-wrap">
+          <img class="article-cover" src="&#x2F;covers&#x2F;8&#x2F;0.png" alt="UniswapV4 Learning">
+          
+          
+            <div class="post-tags article-tags">
+              
+                <span class="post-tag">Solidity</span>
+              
+                <span class="post-tag">Learning</span>
+              
+                <span class="post-tag">Note</span>
+              
+            </div>
+          
+        </figure>
+      
+
+      <header class="article-header">
+        <p class="article-meta">
+          2026-03-12
+          
+            <span>5 分钟阅读</span>
+          
+        </p>
+        <h1>UniswapV4 Learning</h1>
+      </header>
+
+      <div class="article-content">
+        <p><img src="/covers/8/1.png" alt="v4与v3的区别" /></p>
+<p>v4版本相较于v3,主要引入了4个功能:</p>
+<h2 id="1-hooks">1.Hooks</h2>
+<p>在uniswapv4中,每个流动池不再对应一个合约，而是所有池子都在一个合约下(PoolKey作为Pool的唯一ID),以下是官方给出创建流动池的例子</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="solidity"><span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #9399B2;font-style: italic;">// SPDX-License-Identifier: MIT</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">pragma</span><span style="color: #89B4FA;"> solidity</span><span> ^0.8.20</span><span style="color: #9399B2;">;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">import</span><span> {</span><span style="color: #F9E2AF;font-style: italic;">IPoolManager</span><span style="color: #9399B2;">}</span><span style="color: #CBA6F7;"> from</span><span style="color: #A6E3A1;"> &quot;v4-core/src/interfaces/IPoolManager.sol&quot;</span><span style="color: #9399B2;">;</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">import</span><span> {</span><span style="color: #F9E2AF;font-style: italic;">IHooks</span><span style="color: #9399B2;">}</span><span style="color: #CBA6F7;"> from</span><span style="color: #A6E3A1;"> &quot;v4-core/src/interfaces/IHooks.sol&quot;</span><span style="color: #9399B2;">;</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">import</span><span> {</span><span style="color: #F9E2AF;font-style: italic;">PoolKey</span><span style="color: #9399B2;">}</span><span style="color: #CBA6F7;"> from</span><span style="color: #A6E3A1;"> &quot;v4-core/src/types/PoolKey.sol&quot;</span><span style="color: #9399B2;">;</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">import</span><span> {</span><span style="color: #F9E2AF;font-style: italic;">CurrencyLibrary</span><span>, </span><span style="color: #F9E2AF;font-style: italic;">Currency</span><span style="color: #9399B2;">}</span><span style="color: #CBA6F7;"> from</span><span style="color: #A6E3A1;"> &quot;v4-core/src/types/Currency.sol&quot;</span><span style="color: #9399B2;">;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">contract</span><span style="color: #F9E2AF;font-style: italic;"> PoolInitialize</span><span style="color: #9399B2;"> {</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">    using</span><span style="color: #F9E2AF;font-style: italic;"> CurrencyLibrary</span><span style="color: #CBA6F7;"> for</span><span style="color: #F9E2AF;font-style: italic;"> Currency</span><span style="color: #9399B2;">;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #9399B2;font-style: italic;">    // set the initialize router</span></span>
+<span class="giallo-l"><span>    IPoolManager manager </span><span style="color: #94E2D5;">=</span><span style="color: #89B4FA;font-style: italic;"> IPoolManager</span><span style="color: #9399B2;">(</span><span style="color: #CBA6F7;">address</span><span style="color: #9399B2;">(</span><span style="color: #FAB387;">0x01</span><span style="color: #9399B2;">));</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">    function</span><span style="color: #89B4FA;font-style: italic;"> init</span><span style="color: #9399B2;">(</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">        address</span><span style="color: #EBA0AC;font-style: italic;"> token0</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">        address</span><span style="color: #EBA0AC;font-style: italic;"> token1</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">        uint24</span><span style="color: #EBA0AC;font-style: italic;"> swapFee</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">        int24</span><span style="color: #EBA0AC;font-style: italic;"> tickSpacing</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">        address</span><span style="color: #EBA0AC;font-style: italic;"> hook</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">        uint160</span><span style="color: #EBA0AC;font-style: italic;"> sqrtPriceX96</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">        bytes calldata</span><span style="color: #EBA0AC;font-style: italic;"> hookData</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">    )</span><span style="color: #CBA6F7;"> external</span><span style="color: #9399B2;"> {</span></span>
+<span class="giallo-l"><span style="color: #9399B2;font-style: italic;">        // sort your tokens! v4 requires token0 &lt; token1</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">        if</span><span style="color: #9399B2;"> (</span><span>token0 </span><span style="color: #94E2D5;">&gt;</span><span> token1</span><span style="color: #9399B2;">) {</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">            (</span><span>token0</span><span style="color: #9399B2;">,</span><span> token1</span><span style="color: #9399B2;">)</span><span style="color: #94E2D5;"> =</span><span style="color: #9399B2;"> (</span><span>token1</span><span style="color: #9399B2;">,</span><span> token0</span><span style="color: #9399B2;">);</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">        }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>        PoolKey </span><span style="color: #CBA6F7;">memory</span><span> pool </span><span style="color: #94E2D5;">=</span><span style="color: #89B4FA;font-style: italic;"> PoolKey</span><span style="color: #9399B2;">({</span></span>
+<span class="giallo-l"><span>            currency0</span><span style="color: #94E2D5;">:</span><span> Currency</span><span style="color: #94E2D5;">.</span><span style="color: #89B4FA;font-style: italic;">wrap</span><span style="color: #9399B2;">(</span><span>token0</span><span style="color: #9399B2;">),</span></span>
+<span class="giallo-l"><span>            currency1</span><span style="color: #94E2D5;">:</span><span> Currency</span><span style="color: #94E2D5;">.</span><span style="color: #89B4FA;font-style: italic;">wrap</span><span style="color: #9399B2;">(</span><span>token1</span><span style="color: #9399B2;">),</span></span>
+<span class="giallo-l"><span>            fee</span><span style="color: #94E2D5;">:</span><span> swapFee</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span>            tickSpacing</span><span style="color: #94E2D5;">:</span><span> tickSpacing</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span>            hooks</span><span style="color: #94E2D5;">:</span><span style="color: #89B4FA;font-style: italic;"> IHooks</span><span style="color: #9399B2;">(</span><span>hook</span><span style="color: #9399B2;">)</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">        });</span></span>
+<span class="giallo-l"><span>        manager</span><span style="color: #94E2D5;">.</span><span style="color: #89B4FA;font-style: italic;">initialize</span><span style="color: #9399B2;">(</span><span>pool</span><span style="color: #9399B2;">,</span><span> sqrtPriceX96</span><span style="color: #9399B2;">,</span><span> hookData</span><span style="color: #9399B2;">);</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">    }</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">}</span></span>
+<span class="giallo-l"></span></code></pre>
+<p>可见即使token,swapFee等相同,但是如果hook的address不同，也会被看成不同的流动池.</p>
+<p>hook也许是uniswapv4中最重要的内容(在javascript中,hook作为拦截和修改func,使开发者可以拓展代码而不需要修改原始代码),在uniswapv4中,hook的作用也差不多.</p>
+<p>在v4中,hooks可以发挥5个主要功能:</p>
+<p>1.beforeInitialize/afterInitialize</p>
+<p>2.beforeAddLiquidity/afterAddLiquidity</p>
+<p>3.beforeRemoveLiquidity/afterRemoveLiquidity</p>
+<p>4.beforeSwap/afterSwap</p>
+<p>5.beforeDonate/afterDonate</p>
+<p>v4中允许hook在特定操作(如上面功能名称)前后进行调用,从而实现特定操作,同时,hook可以在swap中收取费用，可以静态也可以动态管理.也可以进行特定比例分配给任意地址.</p>
+<p>下图是官方白皮书中hook的工作流程,描述了<code>beforeSwap</code>和<code>afterSwap中hook</code>是如何工作的.</p>
+<p><img src="/covers/8/2.png" alt="官方白皮书中的hook示例" /></p>
+<p>官方给出的hook示例:</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="solidity"><span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #9399B2;font-style: italic;">// SPDX-License-Identifier: MIT</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">pragma</span><span style="color: #89B4FA;"> solidity</span><span> ^0.8.20</span><span style="color: #9399B2;">;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">import</span><span> {</span><span style="color: #F9E2AF;font-style: italic;">BaseHook</span><span style="color: #9399B2;">}</span><span style="color: #CBA6F7;"> from</span><span style="color: #A6E3A1;"> &quot;v4-periphery/src/base/hooks/BaseHook.sol&quot;</span><span style="color: #9399B2;">;</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">import</span><span> {</span><span style="color: #F9E2AF;font-style: italic;">PoolKey</span><span style="color: #9399B2;">}</span><span style="color: #CBA6F7;"> from</span><span style="color: #A6E3A1;"> &quot;v4-core/types/PoolKey.sol&quot;</span><span style="color: #9399B2;">;</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">import</span><span> {</span><span style="color: #F9E2AF;font-style: italic;">IPoolManager</span><span style="color: #9399B2;">}</span><span style="color: #CBA6F7;"> from</span><span style="color: #A6E3A1;"> &quot;v4-core/interfaces/IPoolManager.sol&quot;</span><span style="color: #9399B2;">;</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">import</span><span> {</span><span style="color: #F9E2AF;font-style: italic;">Hooks</span><span style="color: #9399B2;">}</span><span style="color: #CBA6F7;"> from</span><span style="color: #A6E3A1;"> &quot;v4-core/libraries/Hooks.sol&quot;</span><span style="color: #9399B2;">;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">contract</span><span style="color: #F9E2AF;font-style: italic;"> SampleHook</span><span style="color: #CBA6F7;"> is</span><span style="color: #F9E2AF;font-style: italic;"> BaseHook</span><span style="color: #9399B2;">  {</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">    constructor</span><span style="color: #9399B2;">(</span><span style="color: #CBA6F7;">IPoolManager</span><span style="color: #EBA0AC;font-style: italic;"> _manager</span><span style="color: #9399B2;">,</span><span style="color: #CBA6F7;"> string memory</span><span style="color: #EBA0AC;font-style: italic;"> _name</span><span style="color: #9399B2;">,</span><span style="color: #CBA6F7;"> string memory</span><span style="color: #EBA0AC;font-style: italic;"> _symbol</span><span>)</span><span style="color: #89B4FA;font-style: italic;"> BaseHook</span><span style="color: #9399B2;">(</span><span>_manager)</span><span style="color: #9399B2;">{</span></span>
+<span class="giallo-l"><span style="color: #9399B2;font-style: italic;">// do something</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">    function</span><span style="color: #89B4FA;font-style: italic;"> getHookPermissions</span><span style="color: #9399B2;">()</span><span style="color: #CBA6F7;"> public pure override returns</span><span style="color: #9399B2;"> (</span><span style="color: #CBA6F7;">Hooks</span><span>.Permissions</span><span style="color: #CBA6F7;"> memory</span><span style="color: #9399B2;">) {</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">        return</span><span> Hooks</span><span style="color: #94E2D5;">.</span><span style="color: #89B4FA;font-style: italic;">Permissions</span><span style="color: #9399B2;">({</span></span>
+<span class="giallo-l"><span>            beforeInitialize</span><span style="color: #94E2D5;">:</span><span style="color: #FAB387;"> false</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span>            afterInitialize</span><span style="color: #94E2D5;">:</span><span style="color: #FAB387;"> false</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span>            beforeAddLiquidity</span><span style="color: #94E2D5;">:</span><span style="color: #FAB387;"> true</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span>            beforeRemoveLiquidity</span><span style="color: #94E2D5;">:</span><span style="color: #FAB387;"> false</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span>            afterAddLiquidity</span><span style="color: #94E2D5;">:</span><span style="color: #FAB387;"> true</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span>            afterRemoveLiquidity</span><span style="color: #94E2D5;">:</span><span style="color: #FAB387;"> false</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span>            beforeSwap</span><span style="color: #94E2D5;">:</span><span style="color: #FAB387;"> false</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span>            afterSwap</span><span style="color: #94E2D5;">:</span><span style="color: #FAB387;"> false</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span>            beforeDonate</span><span style="color: #94E2D5;">:</span><span style="color: #FAB387;"> false</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span>            afterDonate</span><span style="color: #94E2D5;">:</span><span style="color: #FAB387;"> false</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span>            beforeSwapReturnDelta</span><span style="color: #94E2D5;">:</span><span style="color: #FAB387;"> false</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span>            afterSwapReturnDelta</span><span style="color: #94E2D5;">:</span><span style="color: #FAB387;"> false</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span>            afterAddLiquidityReturnDelta</span><span style="color: #94E2D5;">:</span><span style="color: #FAB387;"> false</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span>            afterRemoveLiquidityReturnDelta</span><span style="color: #94E2D5;">:</span><span style="color: #FAB387;"> false</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">        });</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">    }</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">    function</span><span style="color: #89B4FA;font-style: italic;"> beforeAddLiquidity</span><span style="color: #9399B2;">(</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">        address</span><span style="color: #EBA0AC;font-style: italic;"> sender</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">        PoolKey calldata</span><span style="color: #EBA0AC;font-style: italic;"> key</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">        IPoolManager</span><span>.ModifyLiquidityParams</span><span style="color: #CBA6F7;"> calldata</span><span style="color: #EBA0AC;font-style: italic;"> params</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">        bytes override calldata</span><span style="color: #EBA0AC;font-style: italic;"> hookData</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">    )</span><span style="color: #CBA6F7;"> external returns</span><span style="color: #9399B2;"> (</span><span style="color: #CBA6F7;">bytes4</span><span style="color: #9399B2;">){</span></span>
+<span class="giallo-l"><span style="color: #9399B2;font-style: italic;">    	// do something</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">    }</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">    function</span><span style="color: #89B4FA;font-style: italic;"> afterAddLiquidity</span><span style="color: #9399B2;">(</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">        address</span><span style="color: #EBA0AC;font-style: italic;"> sender</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">        PoolKey calldata</span><span style="color: #EBA0AC;font-style: italic;"> key</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">        IPoolManager</span><span>.ModifyLiquidityParams</span><span style="color: #CBA6F7;"> calldata</span><span style="color: #EBA0AC;font-style: italic;"> params</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">        BalanceDelta</span><span style="color: #EBA0AC;font-style: italic;"> delta</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #CBA6F7;">        bytes calldata</span><span style="color: #EBA0AC;font-style: italic;"> hookData</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">    )</span><span style="color: #CBA6F7;"> external override returns</span><span style="color: #9399B2;"> (</span><span style="color: #CBA6F7;">bytes4</span><span style="color: #9399B2;">,</span><span style="color: #CBA6F7;"> BalanceDelta</span><span style="color: #9399B2;">); {</span></span>
+<span class="giallo-l"><span style="color: #9399B2;font-style: italic;">		// do something</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">    }</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">}</span></span>
+<span class="giallo-l"></span></code></pre>
+<p>可以看到,hook作为一个合约,继承于<code>BaseHook</code>,</p>
+<p>在构造一个hook中,必须包含<code> IPoolManager</code>参数，其为管理接口,同时也有如<code> onlyByPoolManager</code>修饰符,作为管理员权限func.</p>
+<p><code>getHookPermission</code>func必须重载,可以实现上面所说的五个功能，把对应的功能(如<code>beforeAddLiquidity</code>)设置为true即可.</p>
+<h2 id="2-singleton">2.Singleton</h2>
+<p>先前的Uniswap版本使用factor/pool模式进行代币部署,Uniswapv4使用singleton设计模式,所有资金池由一个合约管理,使池子到部署成本降低99%.</p>
+<p>同时singleton与flash accounting互补,v4中,每个操作(如兑换或向池中添加流动性),只更新一个内部净余额 delta,仅在锁定结束时进行外部转账.新的<code>take()</code>和<code>settle()</code>分别借入或存入,不过d elta 值在执行前后必须保持不变.它表示用户和资金池之间的未结余额，并且在交易开始时和结束时应始终返回零.</p>
+<p>对于 delta 这种值,以太坊为此类临时数据提供了一种特定的存储类型：瞬态存储。这是通过 EIP-1153 在 Dencun 升级（2024 年）中引入的。瞬态存储的行为类似于标准以太坊存储，但仅在单个交易中有效。交易结束后，所有瞬态存储值都会自动重置.由于瞬态存储是临时的，不会增加以太坊的永久存储负载，因此使用瞬态存储的作比常规存储便宜得多。例如，写入空存储槽需要 20000 gas，而写入瞬态存储只需 100 gas.</p>
+<p><img src="/covers/8/3.png" alt="Mechanism of Transient Storage" /></p>
+<p><code>By requiring that no tokens are owed to the pool manager or to the caller by the end of the call, the pool’s solvency is enforced.</code></p>
+<p>*** 仅执行一次余额更新，而不是为每个池单独修改余额 ***</p>
+<h2 id="3-flash-accounting">3.Flash accounting</h2>
+<p>两者加上hook,可以增加pool的数量</p>
+<h2 id="4-native-eth">4.Native ETH</h2>
+<p>Uniswapv4允许同时支持WETH和ETH配对.原生ETH转账的gas成本大约是ERC-20转账的一半(ETH的gas成本为21k,而ERC-20为约40k).</p>
+<p>同时,引入hook之后,<code>PoolManager</code>不需要Price Oracle进行数据存储和逻辑处理,Oracle可以通过hook合约.</p>
+<h2 id="5-custom-accounting">5.Custom Accounting</h2>
+<p>Hooks without Custom Accounting:</p>
+<p>大多数流程中(如beforeswap)会造成revert;</p>
+<p>potential attack:</p>
+<p>removing liquidity: beforeSwap</p>
+<p>sandwich attack: beforeSwap+afterSwap and before donate+after donate</p>
+<p>permanently lock: before removeLiquidity, after removeLiquidity</p>
+<p>总体来说,v4算法还是集中流动性,hook实习pool可定制性,singleton,flash accounting以及native ETH降低gas成本.</p>
+<p>参考资料：</p>
+<p><a rel="external" href="https://github.com/Uniswap/v4-core/blob/main/docs/security/audits/OpenZeppelin_audit_core.pdf">audit by OpenZeppelin</a></p>
+<p><a rel="external" href="https://foresightnews.pro/article/detail/69506">coset</a></p>
+<p><a rel="external" href="https://research.2077.xyz/a-complete-guide-to-uniswap-v4-1#general-behavior-of-hooks">2077research</a></p>
+
+      </div>
+    </div>
+  </article>
+
+
+      </main>
+
+      <footer class="site-footer">
+        <p>Built with Zola</p>
+      </footer>
+    </div>
+
+    
+
+  
+  
+    <aside class="page-sidebar article-toc" aria-label="文章目录">
+      <nav class="article-toc-nav">
+        <ul class="article-toc-list">
+          
+            <li class="article-toc-item">
+              <a class="article-toc-link" href="#1-hooks">
+                <span class="article-toc-link-text">1.Hooks</span>
+                
+              </a>
+              
+            </li>
+          
+            <li class="article-toc-item">
+              <a class="article-toc-link" href="#2-singleton">
+                <span class="article-toc-link-text">2.Singleton</span>
+                
+              </a>
+              
+            </li>
+          
+            <li class="article-toc-item">
+              <a class="article-toc-link" href="#3-flash-accounting">
+                <span class="article-toc-link-text">3.Flash accounting</span>
+                
+              </a>
+              
+            </li>
+          
+            <li class="article-toc-item">
+              <a class="article-toc-link" href="#4-native-eth">
+                <span class="article-toc-link-text">4.Native ETH</span>
+                
+              </a>
+              
+            </li>
+          
+            <li class="article-toc-item">
+              <a class="article-toc-link" href="#5-custom-accounting">
+                <span class="article-toc-link-text">5.Custom Accounting</span>
+                
+              </a>
+              
+            </li>
+          
+        </ul>
+      </nav>
+    </aside>
+    <div class="mobile-toc-backdrop" id="mobile-toc-backdrop" hidden></div>
+    <div class="mobile-toc-panel" id="mobile-toc-panel" hidden aria-label="移动端文章目录">
+      <div class="mobile-toc-sheet">
+        <p class="mobile-toc-title">文章目录</p>
+        <nav class="article-toc-nav">
+          <ul class="article-toc-list">
+            
+              <li class="article-toc-item">
+                <a class="article-toc-link" href="#1-hooks">
+                  <span class="article-toc-link-text">1.Hooks</span>
+                  
+                </a>
+                
+              </li>
+            
+              <li class="article-toc-item">
+                <a class="article-toc-link" href="#2-singleton">
+                  <span class="article-toc-link-text">2.Singleton</span>
+                  
+                </a>
+                
+              </li>
+            
+              <li class="article-toc-item">
+                <a class="article-toc-link" href="#3-flash-accounting">
+                  <span class="article-toc-link-text">3.Flash accounting</span>
+                  
+                </a>
+                
+              </li>
+            
+              <li class="article-toc-item">
+                <a class="article-toc-link" href="#4-native-eth">
+                  <span class="article-toc-link-text">4.Native ETH</span>
+                  
+                </a>
+                
+              </li>
+            
+              <li class="article-toc-item">
+                <a class="article-toc-link" href="#5-custom-accounting">
+                  <span class="article-toc-link-text">5.Custom Accounting</span>
+                  
+                </a>
+                
+              </li>
+            
+          </ul>
+        </nav>
+      </div>
+    </div>
+  
+
+
+  </div>
+
+  <div class="floating-tools" id="floating-tools" aria-label="页面工具">
+    <a class="floating-tool-btn" href="https://spn21.github.io/" title="返回首页" aria-label="返回首页">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 11.5L12 5l8 6.5"></path>
+        <path d="M6.5 10.5V19h11v-8.5"></path>
+      </svg>
+    </a>
+    <a class="floating-tool-btn" id="back-to-top" href="#top" title="返回顶部" aria-label="返回顶部">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 16l5-5 5 5"></path>
+        <path d="M7 11l5-5 5 5"></path>
+      </svg>
+    </a>
+    <button class="floating-tool-btn" id="toc-toggle" type="button" title="显示目录列表" aria-label="显示目录列表" aria-expanded="false" hidden>≡</button>
+  </div>
+
+  <svg class="liquid-filters" aria-hidden="true" focusable="false">
+    <filter id="liquid-glass-panel" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.012" numOctaves="2" seed="19" result="noise"></feTurbulence>
+      <feGaussianBlur in="noise" stdDeviation="0.75" result="blurred-noise"></feGaussianBlur>
+      <feDisplacementMap in="SourceGraphic" in2="blurred-noise" scale="18" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+    </filter>
+    <filter id="liquid-glass-orb" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.02 0.02" numOctaves="2" seed="29" result="noise"></feTurbulence>
+      <feGaussianBlur in="noise" stdDeviation="0.85" result="blurred-noise"></feGaussianBlur>
+      <feDisplacementMap in="SourceGraphic" in2="blurred-noise" scale="28" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+    </filter>
+  </svg>
+
+  <script>
+    // Theme switcher functionality
+    const themeSwitcher = document.getElementById('theme-switcher');
+    
+    // Initialize theme switcher button
+    function updateThemeSwitcherUI() {
+      const theme = localStorage.getItem('selectedTheme') || 'liquidweb';
+      if (theme === 'cli') {
+        themeSwitcher.textContent = '💻';
+        themeSwitcher.title = '切换到 Liquid 主题';
+      } else {
+        themeSwitcher.textContent = '🌙';
+        themeSwitcher.title = '切换到 CLI 主题';
+      }
+    }
+    
+    updateThemeSwitcherUI();
+    
+    themeSwitcher.addEventListener('click', () => {
+      const theme = localStorage.getItem('selectedTheme') || 'liquidweb';
+      const newTheme = theme === 'liquidweb' ? 'cli' : 'liquidweb';
+      localStorage.setItem('selectedTheme', newTheme);
+      
+      // Reload to apply theme
+      window.location.reload();
+    });
+
+    // Floating tools functionality
+    const backTop = document.getElementById('back-to-top');
+    const tocToggle = document.getElementById('toc-toggle');
+    const mobileTocPanel = document.getElementById('mobile-toc-panel');
+    const mobileTocBackdrop = document.getElementById('mobile-toc-backdrop');
+
+    if (tocToggle && mobileTocPanel && mobileTocBackdrop) {
+      tocToggle.hidden = false;
+
+      const setMobileTocOpen = (open) => {
+        mobileTocPanel.hidden = !open;
+        mobileTocBackdrop.hidden = !open;
+        tocToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        document.body.classList.toggle('mobile-toc-open', open);
+      };
+
+      tocToggle.addEventListener('click', () => {
+        const isOpen = tocToggle.getAttribute('aria-expanded') === 'true';
+        setMobileTocOpen(!isOpen);
+      });
+
+      mobileTocBackdrop.addEventListener('click', () => {
+        setMobileTocOpen(false);
+      });
+
+      mobileTocPanel.addEventListener('click', (event) => {
+        const target = event.target;
+        if (target instanceof HTMLElement && target.closest('a')) {
+          setMobileTocOpen(false);
+        }
+      });
+
+      window.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          setMobileTocOpen(false);
+        }
+      });
+    }
+
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 200) {
+        backTop.classList.add('show');
+      } else {
+        backTop.classList.remove('show');
+      }
+    });
+    backTop.addEventListener('click', (event) => {
+      event.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>
