@@ -118,22 +118,6 @@ video,
   text-transform: lowercase;
 }
 
-.theme-switcher {
-  appearance: none;
-  border: 1px solid var(--cli-border-strong);
-  background: var(--cli-panel-soft);
-  color: var(--cli-text-secondary);
-  border-radius: 999px;
-  padding: 0.5rem 0.8rem;
-  font: inherit;
-  cursor: pointer;
-}
-
-.theme-switcher:hover {
-  color: var(--cli-accent);
-  border-color: var(--cli-accent);
-}
-
 .shell-footer {
   display: flex;
   flex-direction: column;

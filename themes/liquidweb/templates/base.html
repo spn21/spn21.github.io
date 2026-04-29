@@ -35,7 +35,6 @@
           <a href="{{ get_url(path='@/_index.md') }}">首页</a>
           <a href="{{ get_url(path='@/categories.md') }}">分类</a>
           <a href="{{ get_url(path='about') }}">关于</a>
-          <button class="theme-switcher" id="theme-switcher" type="button" title="切换主题">🌙</button>
         </nav>
       </header>
 
@@ -81,32 +80,6 @@
   </svg>
 
   <script>
-    // Theme switcher functionality
-    const themeSwitcher = document.getElementById('theme-switcher');
-    
-    // Initialize theme switcher button
-    function updateThemeSwitcherUI() {
-      const theme = localStorage.getItem('selectedTheme') || 'liquidweb';
-      if (theme === 'cli') {
-        themeSwitcher.textContent = '💻';
-        themeSwitcher.title = '切换到 Liquid 主题';
-      } else {
-        themeSwitcher.textContent = '🌙';
-        themeSwitcher.title = '切换到 CLI 主题';
-      }
-    }
-    
-    updateThemeSwitcherUI();
-    
-    themeSwitcher.addEventListener('click', () => {
-      const theme = localStorage.getItem('selectedTheme') || 'liquidweb';
-      const newTheme = theme === 'liquidweb' ? 'cli' : 'liquidweb';
-      localStorage.setItem('selectedTheme', newTheme);
-      
-      // Reload to apply theme
-      window.location.reload();
-    });
-
     // Floating tools functionality
     const backTop = document.getElementById('back-to-top');
     const tocToggle = document.getElementById('toc-toggle');

@@ -160,7 +160,7 @@ contract SampleHook is BaseHook  {
 ``` By requiring that no tokens are owed to the pool manager or to the caller by the end of the call, the pool’s solvency is enforced. ```
 
 
-*** 仅执行一次余额更新，而不是为每个池单独修改余额 ***
+**仅执行一次余额更新，而不是为每个池单独修改余额**
 
 ## 3.Flash accounting
 
@@ -181,12 +181,16 @@ Hooks without Custom Accounting:
 
 potential attack:
 
+
+```solidity
+
 removing liquidity: beforeSwap
 
 sandwich attack: beforeSwap+afterSwap and before donate+after donate
 
 permanently lock: before removeLiquidity, after removeLiquidity
 
+```
 总体来说,v4算法还是集中流动性,hook实习pool可定制性,singleton,flash accounting以及native ETH降低gas成本.
 
 参考资料：

@@ -19,7 +19,6 @@
           <span></span>
         </div>
         <div class="terminal-title">spn21.github.io :: cli</div>
-        <button class="theme-switcher" id="theme-switcher" title="切换主题">theme</button>
       </header>
 
       <main class="terminal-body">
@@ -28,28 +27,5 @@
     </div>
   </div>
 
-  <script>
-    const themeSwitcher = document.getElementById('theme-switcher');
-
-    function updateThemeSwitcherUI() {
-      const theme = localStorage.getItem('selectedTheme') || 'cli';
-      if (theme === 'liquidweb') {
-        themeSwitcher.textContent = 'theme: liquid';
-        themeSwitcher.title = '切换到 CLI 主题';
-      } else {
-        themeSwitcher.textContent = 'theme: cli';
-        themeSwitcher.title = '切换到 Liquid 主题';
-      }
-    }
-
-    updateThemeSwitcherUI();
-
-    themeSwitcher.addEventListener('click', () => {
-      const theme = localStorage.getItem('selectedTheme') || 'cli';
-      const newTheme = theme === 'cli' ? 'liquidweb' : 'cli';
-      localStorage.setItem('selectedTheme', newTheme);
-      window.location.reload();
-    });
-  </script>
 </body>
 </html>
