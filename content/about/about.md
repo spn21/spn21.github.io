@@ -4,6 +4,6 @@ template = "about-page.html"
 path = "about"
 +++
 
-Interest in arknight,love Skadi、Texas the Omertosa、Muelsyse and Ling.
+Interest in [Arknight](https://ak.hypergryph.com/).
 
 The Ultimate Cybersociety Phobic
