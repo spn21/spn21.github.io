@@ -46,11 +46,63 @@ draft = true
 
 所有候选工具按统一维度打分(0–5 分,5 为最佳):
 
-1. **检出能力 (Detection Power)** — 覆盖的漏洞类别、误报率、深度
+1. **漏洞检查能力 (Detection Power)** — 覆盖的漏洞类别、误报率、深度
 2. **可集成性 (Integrability)** — CLI / CI / IDE / API,与 Hardhat、Foundry、Truffle 的兼容
 3. **使用门槛 (Usability)** — 安装、配置、上手成本,文档质量
 4. **可扩展性 (Extensibility)** — 自定义规则 / 不变量 / 探测器 (detector) 编写
 5. **性能 (Performance)** — 大型代码库的扫描时间,可并行性
 6. **成熟度与生态 (Maturity)** — 社区活跃度、版本迭代、案例
 7. **成本 (Cost)** — 开源/付费/按席位/按项目
-8. **链/语言覆盖 (Coverage)** — Solidity / Vyper / Yul、EVM 兼容链
+8. **链/语言覆盖 (可选)** — Solidity / Vyper / Yul、EVM 兼容链
+
+
+## 0x04 实例工具
+
+### 静态分析
+
+[Slither](https://github.com/crytic/slither)
+
+[Aderyn (Cyfrin)](https://cyfrin.gitbook.io/cyfrin-docs)
+
+Semgrep
+
+### 符号执行与形式化验证
+
+Mythril
+
+Manticore
+
+Halmos(a16z)
+
+Cerora Prover
+
+### Fuzz / Invariant
+
+Foundry Fuzz / Invariant
+
+Echidna
+
+Medusa(Crytic)
+
+Wake
+
+### 运行时监控与事件响应 (Runtime Monitoring & IR)
+
+| 工具/平台 | 定位 | 核心能力 | 成本 |  |
+| --- | --- | --- | --- | --- |
+| OpenZeppelin Defender | 运维 + 监控 | Sentinel 监控、Autotasks 自动化、Relayer、升级管理 | SaaS,免费档 + 付费 |
+| Forta | 去中心化检测网络 | 自定义 detection bots、丰富社区 bot | 开源 + 订阅 |
+| Tenderly | 观测 + 模拟 | 交易模拟、War Room、Alerts、Web3 Actions | SaaS,按调用计费 |
+| Hypernative / Hexagate | 实时威胁检测 | ML 异常检测、防火墙类拦截 | 商业 |
+
+
+漏洞审查能力: 3
+误报/可解释性: 3
+实际项目支持: 2
+学习/使用成本:1
+开源/商业:1
+
+多工具聚合
+
+llm幻觉降噪
+
