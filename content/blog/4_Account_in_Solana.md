@@ -5,7 +5,7 @@ date = 2026-02-12
 [extra]
 cover_image = "/covers/forth.jpeg"
 cover_sentence = " "
-tags = ["Solana", "account", "note"]
+tags = ["Solana", "Account", "Note"]
 draft = false
 +++
 
@@ -26,11 +26,15 @@ In Solidity and Ethereum, SSTORE2 or SSTORE3 can store data in another smart con
 
 Solana's model is similar to Ethereum, a key-value store.(be up to 10MB)
 
-In Solana(anchor), all storage(account data), is treared as a struct when we try to read or write data, we should try to interpret these data. In anchor, it will derserialize and serialize account data into structs.So we need to initialize the Solana account before we can use it.
+![](/covers/4/1.png)
+
+
+
+In Solana(Anchor), all storage(account data), is treared as a struct when we try to read or write data, we should try to interpret these data. In Anchor, it will derserialize and serialize account data into structs.So we need to initialize the Solana account before we can use it.
 
 address of initialized accounts in Solana depond on the program that owns the storage account, basic_storage (which is akin to the address of the deploying contract) and the seeds (which is akin to create2’s “salt”)
 
-note: in anchor, it silently converts rust snake case to typescript camel case.
+note: in Anchor, it silently converts rust snake case to typescript camel case.
 
 ## 0x02 
 
@@ -40,13 +44,17 @@ And accounts with zero data are not free because Solana should create index and 
 
 We can use "solana rent `<number of bytes>` to calculate.
 
+```rust
+minimum_balance: (account_size + 128) * 3,480 lamports/byte - year * 2 years
+```
+
 [a funny post about solana rent](https://www.reddit.com/r/solana/comments/qwin1h/my_sol_balance_in_the_wallet_is_decreasing/?rdt=33377)
 
 ## 0x03
 
-UncheckedAccount in anchor
+UncheckedAccount in Anchor
 
-the type to tell anchor do not check the account when this account being read, and this program doesn't have `Context`
+the type to tell Anchor do not check the account when this account being read, and this program doesn't have `Context`
 
 **"If a malicious user crafts an account the program did not create and then passes it to the Solana program, and the Solana program blindly trusts the data in the account, critical errors may occur."**
 
@@ -105,7 +113,7 @@ and send this account to withdraw:
 
 the check will pass
 
-but in anchor context:
+but in Anchor context:
 
 ```rust
 
@@ -118,14 +126,14 @@ but in anchor context:
 
 ```
 
-in anchor it will check `account owner` and account data(8-byte),and will check account size:
+in Anchor it will check `account owner` and account data(8-byte),and will check account size:
 
 ```rust
   
   data.len() == 8 + size_of::<BankAccount>()
 ```
 
-so in anchor: `Account<T>` mandatory account soverrignty and structure verification.
+so in Anchor: `Account<T>` mandatory account soverrignty and structure verification.
 
 ## 0x04
 
@@ -249,7 +257,7 @@ The System Program updates the balance on your behalf
 
 `#[derive(Accounts)]` and account types
 
-In solana anchor, `#[derive(Accounts)]`is an attribute-like macro applied to a rust struct. This struct defines all accounts that an instruction may access during execution.
+In solana Anchor, `#[derive(Accounts)]`is an attribute-like macro applied to a rust struct. This struct defines all accounts that an instruction may access during execution.
 
 Solana is parallel transaction execution so it is fast, if both Alice and Bob specify the same storage account, solana will infer a write conflict, and usually choose the one with higher priority fee, the other transacation will fail. This conflict detection is only possible because accounts are decalred up front.
 
