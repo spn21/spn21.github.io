@@ -3,10 +3,10 @@ title = "一个sol的\"旅程\""
 date = 2026-05-23
 
 [extra]
-cover_image = "/covers/10/0.jpg"
+cover_image = "/covers/12/0.jpg"
 cover_sentence = " "
-tags =  ["Solana","Security", "note"]
-draft = true
+tags =  ["Solana","Security", "Note"]
+draft = false
 +++
 
 
