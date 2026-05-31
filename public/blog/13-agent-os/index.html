@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>
+Agent 与 OS 的一点类比 | 厶月
+</title>
+  <meta name="description" content="
+
+  
+ 
+  
+
+">
+  <link rel="icon" href="https://spn21.github.io/favicon.svg" type="image/svg+xml">
+  <link rel="shortcut icon" href="https://spn21.github.io/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="https://spn21.github.io/css/liquidweb.css">
+</head>
+<body>
+  <div class="liquid-bg" aria-hidden="true">
+    <div class="liquid-overlay"></div>
+    <div class="liquid-glow liquid-glow-a"></div>
+    <div class="liquid-glow liquid-glow-b"></div>
+    <div class="liquid-glow liquid-glow-c"></div>
+  </div>
+
+  <div class="site-layout
+ site-layout-with-sidebar
+">
+    <div class="site-shell">
+      <header class="site-header">
+        <a class="brand" href="https://spn21.github.io/">
+          <span class="brand-logo" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M13 2.8V10h6.3L11 21.2V14H4.7L13 2.8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"></path>
+            </svg>
+          </span>
+          <span class="brand-copy">
+            <strong>厶月</strong>
+            <small> </small>
+          </span>
+        </a>
+        <nav class="site-nav">
+          <a href="https://spn21.github.io/">首页</a>
+          <a href="https://spn21.github.io/blog/categories/">分类</a>
+          <a href="https://spn21.github.io/about">关于</a>
+        </nav>
+      </header>
+
+      <main class="site-main">
+        
+
+  <article class="article-page">
+    <div class="article-shell article-main">
+      <a class="back-link" href="https://spn21.github.io/blog/categories/">返回分类列表</a>
+      
+        <figure class="article-cover-wrap">
+          <img class="article-cover" src="&#x2F;covers&#x2F;third.png" alt="Agent 与 OS 的一点类比">
+          
+            <figcaption class="article-cover-sentence"> </figcaption>
+          
+          
+            <div class="post-tags article-tags">
+              
+                <span class="post-tag">Agent</span>
+              
+                <span class="post-tag">OS</span>
+              
+                <span class="post-tag">Note</span>
+              
+            </div>
+          
+        </figure>
+      
+
+      <header class="article-header">
+        <p class="article-meta">
+          2026-05-31
+          
+            <span>12 分钟阅读</span>
+          
+        </p>
+        <h1>Agent 与 OS 的一点类比</h1>
+      </header>
+
+      <div class="article-content">
+        <p>最近学习 Agent, 越学越像在重新理解操作系统。</p>
+<p>很多概念看起来是新的:</p>
+<p>Model, Tool Use, Function Calling, Context Window, RAG, Multi-Agent, Orchestrator...</p>
+<p>但如果把这些词稍微往底层压一压，会发现它们背后并不陌生。</p>
+<p>操作系统当年要解决的问题是:</p>
+<ul>
+<li>怎么隔离程序</li>
+<li>怎么分配资源</li>
+<li>怎么调度执行</li>
+<li>怎么让用户程序安全访问外部能力</li>
+<li>怎么在有限内存里放下更大的工作集</li>
+</ul>
+<p>Agent 系统今天要解决的问题其实也差不多，只是资源从 CPU / memory / disk 变成了 token / reasoning time / tool permission。</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="plain"><span class="giallo-l"><span>OS:</span></span>
+<span class="giallo-l"><span>user program -&gt; syscall -&gt; kernel -&gt; hardware / file / network</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Agent:</span></span>
+<span class="giallo-l"><span>model -&gt; function calling -&gt; harness -&gt; web / code / database / external system</span></span></code></pre>
+<p>所以 Agent 并不是凭空出现的一种新魔法，更像是自然语言时代的"用户态程序"。</p>
+<h2 id="0x01-process-thread-agent-sub-agent">0x01 Process / Thread -&gt; Agent / sub-Agent</h2>
+<p>在操作系统里，process 是资源边界，thread 是执行单元。</p>
+<p>同一个进程里的线程可以共享地址空间，读写同一块内存；不同进程之间默认隔离，如果要交流，就要通过 IPC、socket、pipe、shared memory 这类机制。</p>
+<p>Agent 世界也有类似结构:</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="plain"><span class="giallo-l"><span>main Agent</span></span>
+<span class="giallo-l"><span>    -&gt; sub-Agent A</span></span>
+<span class="giallo-l"><span>    -&gt; sub-Agent B</span></span>
+<span class="giallo-l"><span>    -&gt; sub-Agent C</span></span></code></pre>
+<p>多个 Agent 并行协作，第一眼看起来是效率提升。</p>
+<p>但只要它们开始共享状态，老问题就回来了:</p>
+<ul>
+<li>谁能看到 shared context?</li>
+<li>谁能修改 task state?</li>
+<li>多个 Agent 同时写同一份计划怎么办?</li>
+<li>一个 Agent 等另一个 Agent 的结果，另一个 Agent 又在等它，是否会 deadlock?</li>
+<li>sub-Agent 的输出如果互相矛盾，谁来做 consistency check?</li>
+</ul>
+<p>这和多线程编程很像。</p>
+<p>共享上下文像共享内存，速度快，但也容易出现 race condition。</p>
+<p>消息传递像 IPC，边界清楚，但会增加通信成本。</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="plain"><span class="giallo-l"><span>shared memory:</span></span>
+<span class="giallo-l"><span>fast, but dangerous</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>message passing:</span></span>
+<span class="giallo-l"><span>clean, but expensive</span></span></code></pre>
+<p>所以 Multi-Agent 的难点不只是"让很多 Agent 同时跑"，而是要定义清楚:</p>
+<p>谁拥有状态，谁能修改状态，谁负责最终合并结果。</p>
+<p>不然并行越多，系统越像一个没有锁的多线程程序。</p>
+<h2 id="0x02-system-call-tool-use">0x02 System Call -&gt; Tool Use</h2>
+<p>我觉得最像的部分是 system call 和 tool use。</p>
+<p>用户程序不能直接访问硬件，不能随便读磁盘、发网络包、改内核数据结构。</p>
+<p>它必须通过系统调用陷入内核:</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="c"><span class="giallo-l"><span style="color: #89B4FA;font-style: italic;">read</span><span style="color: #9399B2;">(</span><span>fd</span><span style="color: #9399B2;">,</span><span> buf</span><span style="color: #9399B2;">,</span><span> size</span><span style="color: #9399B2;">);</span></span>
+<span class="giallo-l"><span style="color: #89B4FA;font-style: italic;">write</span><span style="color: #9399B2;">(</span><span>fd</span><span style="color: #9399B2;">,</span><span> buf</span><span style="color: #9399B2;">,</span><span> size</span><span style="color: #9399B2;">);</span></span>
+<span class="giallo-l"><span style="color: #89B4FA;font-style: italic;">open</span><span style="color: #9399B2;">(</span><span>path</span><span style="color: #9399B2;">,</span><span> flags</span><span style="color: #9399B2;">);</span></span></code></pre>
+<p>内核检查权限、执行操作、返回结果。</p>
+<p>Agent 也是一样。</p>
+<p>模型本身不会真的上网，不会真的运行代码，也不会真的访问数据库。</p>
+<p>它只能生成一个结构化请求:</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="json"><span class="giallo-l"><span style="color: #9399B2;">{</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">  &quot;</span><span style="color: #89B4FA;">tool</span><span style="color: #9399B2;">&quot;:</span><span style="color: #A6E3A1;"> &quot;search&quot;</span><span style="color: #9399B2;">,</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">  &quot;</span><span style="color: #89B4FA;">arguments</span><span style="color: #9399B2;">&quot;: {</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">    &quot;</span><span style="color: #89B4FA;">query</span><span style="color: #9399B2;">&quot;:</span><span style="color: #A6E3A1;"> &quot;latest OpenAI API docs&quot;</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">  }</span></span>
+<span class="giallo-l"><span style="color: #9399B2;">}</span></span></code></pre>
+<p>然后交给 harness 执行。</p>
+<p>这里的本质是:</p>
+<blockquote>
+<p>在权限边界上打一个受控的洞。</p>
+</blockquote>
+<p>能力从这个洞流进来，风险也被这个洞隔住。</p>
+<p>OS 里系统调用需要 syscall table、permission check、capability model。</p>
+<p>Agent 里 tool use 也需要:</p>
+<ul>
+<li>tool schema</li>
+<li>argument validation</li>
+<li>sandbox</li>
+<li>permission boundary</li>
+<li>audit log</li>
+<li>retry / timeout</li>
+</ul>
+<p>如果没有 harness 这层，model 就像一个能生成指令但没有内核保护的程序。</p>
+<p>它可能说"删除所有文件"，也可能说"访问某个私有数据库"。</p>
+<p>真正决定能不能做的，不应该是模型的欲望，而是 tool boundary。</p>
+<h2 id="0x03-cache-virtual-memory-context-window">0x03 Cache / Virtual Memory -&gt; Context Window</h2>
+<p>Context window 是 Agent 最贵的资源。</p>
+<p>它不像普通内存，可以随便塞；每个 token 都会影响成本、速度和注意力分配。</p>
+<p>这和 CPU cache / virtual memory 的感觉很像。</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="plain"><span class="giallo-l"><span>register:</span></span>
+<span class="giallo-l"><span>    当前正在推理的少量变量</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>cache:</span></span>
+<span class="giallo-l"><span>    最近几轮对话 / 当前文件 / 当前任务计划</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>memory:</span></span>
+<span class="giallo-l"><span>    更长的项目上下文 / 文档 / 历史状态</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>disk:</span></span>
+<span class="giallo-l"><span>    压缩摘要 / RAG 知识库 / log / repo</span></span></code></pre>
+<p>当上下文放不下时，Agent 框架就要做 context compression。</p>
+<p>这其实很像 paging / swapping。</p>
+<p>不同的是，操作系统换出去的是 page，Agent 换出去的是语义。</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="plain"><span class="giallo-l"><span>memory page:</span></span>
+<span class="giallo-l"><span>    bytes with address</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>context summary:</span></span>
+<span class="giallo-l"><span>    meaning with loss</span></span></code></pre>
+<p>这里有一个很重要的不同:</p>
+<p>操作系统分页通常希望语义无损，换出去再换回来，程序看到的 byte 应该还是原来的 byte。</p>
+<p>但 context compression 很难做到无损。</p>
+<p>摘要一旦丢掉细节，后面再取回来时，Agent 可能只记得"大概发生过什么"，不记得"具体哪一行为什么这么改"。</p>
+<p>所以 Agent 的 memory management 更像:</p>
+<p>缓存 + 摘要 + 日志检索的混合体。</p>
+<p>它不只是容量问题，也是信息保真度问题。</p>
+<h2 id="0x04-file-system-mount-rag">0x04 File System Mount -&gt; RAG</h2>
+<p>RAG 很像把外部知识库挂载进系统。</p>
+<p>操作系统里，文件系统不一定都在本地磁盘。</p>
+<p>它可以 mount:</p>
+<ul>
+<li>local disk</li>
+<li>network storage</li>
+<li>external device</li>
+<li>virtual filesystem</li>
+</ul>
+<p>程序看到的是一个统一的路径树。</p>
+<p>Agent 也类似。</p>
+<p>模型自己的 context window 放不下所有资料，所以把外部文档、代码库、数据库、网页内容挂到 RAG 后面。</p>
+<p>需要的时候检索，不需要的时候不占上下文。</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="plain"><span class="giallo-l"><span>expensive fast memory:</span></span>
+<span class="giallo-l"><span>    context window</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>cheap large storage:</span></span>
+<span class="giallo-l"><span>    vector db / documents / repo / logs</span></span></code></pre>
+<p>这和 OS 用低速大容量存储补偿昂贵内存很像。</p>
+<p>但是 RAG 和文件系统也有关键不同。</p>
+<p>文件系统读文件，路径通常是确定的:</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="plain"><span class="giallo-l"><span>/home/user/project/main.rs</span></span></code></pre>
+<p>RAG 检索更像"语义路径":</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="plain"><span class="giallo-l"><span>&quot;和权限边界相关的历史设计文档&quot;</span></span></code></pre>
+<p>它不是按地址取数据，而是按相似度取数据。</p>
+<p>所以 RAG 的问题不是文件找不到，而是:</p>
+<ul>
+<li>取到了看起来相关但其实不相关的 chunk</li>
+<li>没取到真正关键的上下文</li>
+<li>取到了过期文档</li>
+<li>多个片段之间互相冲突</li>
+</ul>
+<p>这就像一个文件系统会根据"感觉像"来返回文件。</p>
+<p>很强，也很危险。</p>
+<h2 id="0x05-kernel-scheduler-harness-orchestrator">0x05 Kernel / Scheduler -&gt; Harness / Orchestrator</h2>
+<p>Agent = Model + Harness。</p>
+<p>Model 是计算本身，Harness 更像操作系统内核。</p>
+<p>它负责:</p>
+<ul>
+<li>管 tool permission</li>
+<li>管 sandbox</li>
+<li>管上下文注入</li>
+<li>管任务分解</li>
+<li>管 tool call 的返回</li>
+<li>管错误恢复</li>
+<li>管多 Agent 调度</li>
+</ul>
+<p>在多 Agent 系统里，Orchestrator 就更像 scheduler。</p>
+<p>它要决定:</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="plain"><span class="giallo-l"><span>which Agent runs?</span></span>
+<span class="giallo-l"><span>how long does it run?</span></span>
+<span class="giallo-l"><span>what context does it receive?</span></span>
+<span class="giallo-l"><span>where should its result go?</span></span>
+<span class="giallo-l"><span>should it be retried?</span></span>
+<span class="giallo-l"><span>should it be killed?</span></span></code></pre>
+<p>这和操作系统里的调度问题很像。</p>
+<p>CPU 时间有限，所以 OS 要做 time slice。</p>
+<p>推理时间和 token 也有限，所以 Agent 系统要决定哪个子任务值得继续推，哪个任务应该提前停止。</p>
+<p>一个成熟的 Agent framework，最后大概率会长出很多 OS 味道的东西:</p>
+<ul>
+<li>permission model</li>
+<li>scheduler</li>
+<li>memory manager</li>
+<li>process table</li>
+<li>tool registry</li>
+<li>logging system</li>
+<li>sandbox</li>
+<li>recovery mechanism</li>
+</ul>
+<p>只是它们服务的不是二进制程序，而是自然语言程序。</p>
+<h2 id="0x06-xiang-tong-dian-du-shi-zai-you-xian-zi-yuan-shang-gou-zao-zhi-xu">0x06 相同点: 都是在有限资源上构造秩序</h2>
+<p>OS 和 Agent 最像的地方，不是某个 API 的表面对应，而是它们都在处理同一种系统问题:</p>
+<blockquote>
+<p>怎么让一个不完全可信、能力有限、需要外部资源的执行体，稳定地完成任务。</p>
+</blockquote>
+<p>OS 面对的是 user program。</p>
+<p>Agent harness 面对的是 model。</p>
+<p>两者都不能假设执行体永远正确。</p>
+<p>程序会 crash，model 会 hallucinate。</p>
+<p>程序会越界访问，model 会越权请求。</p>
+<p>程序会死循环，model 会陷入无意义的推理循环。</p>
+<p>程序需要 I/O，model 需要 tool。</p>
+<p>所以核心都不是"给它更多能力"，而是:</p>
+<ul>
+<li>能力如何授权</li>
+<li>状态如何隔离</li>
+<li>资源如何计量</li>
+<li>错误如何恢复</li>
+<li>输出如何验证</li>
+</ul>
+<p>从这个角度看，Agent engineering 很像系统工程。</p>
+<p>不是 prompt 写得更华丽，而是边界、调度、记忆、工具、验证这些东西是否真的可控。</p>
+<h2 id="0x07-bu-tong-dian-agent-de-zhuang-tai-shi-yu-yi-de">0x07 不同点: Agent 的状态是语义的</h2>
+<p>但 Agent 和 OS 也不能完全等同。</p>
+<p>最大的不同是:</p>
+<p>OS 管理的是确定性的机器状态，Agent 管理的是不稳定的语义状态。</p>
+<p>操作系统里的内存地址、page table、file descriptor 都是明确的。</p>
+<p>但 Agent 的 context 不是这样。</p>
+<p>一句话放进上下文后，它产生什么影响，不只是由字面内容决定，还取决于:</p>
+<ul>
+<li>它和其它上下文的关系</li>
+<li>模型当前注意到什么</li>
+<li>prompt 的优先级</li>
+<li>工具返回的结构</li>
+<li>历史摘要有没有丢细节</li>
+</ul>
+<p>所以 OS 里的 bug 通常可以追到某个状态转移。</p>
+<p>Agent 里的 bug 经常是:</p>
+<p>"它好像理解错了"</p>
+<p>"它漏看了某个约束"</p>
+<p>"它把旧信息当成新的"</p>
+<p>"它把类似概念混在一起了"</p>
+<p>这类问题更难 debug。</p>
+<p>因为 byte-level state 可以 dump，semantic-level state 很难完整 dump。</p>
+<h2 id="0x08-bu-tong-dian-os-de-cheng-xu-bei-zhi-xing-agent-de-cheng-xu-zai-sheng-cheng">0x08 不同点: OS 的程序被执行，Agent 的程序在生成</h2>
+<p>另一个区别是:</p>
+<p>传统程序通常先写好，再交给 OS 执行。</p>
+<p>Agent 的"程序"很多时候是在运行时生成的。</p>
+<p>Prompt、tool call、intermediate reasoning、subtask plan，都是边执行边生成。</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="plain"><span class="giallo-l"><span>traditional:</span></span>
+<span class="giallo-l"><span>source code -&gt; compile -&gt; execute</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>agent:</span></span>
+<span class="giallo-l"><span>goal -&gt; plan -&gt; tool use -&gt; observe -&gt; re-plan -&gt; execute</span></span></code></pre>
+<p>这让 Agent 更灵活，也更难验证。</p>
+<p>OS 可以假设程序二进制已经存在。</p>
+<p>Agent harness 却要面对一个不断改写自己执行路径的模型。</p>
+<p>所以 Agent 系统里，verification 可能比 generation 更重要。</p>
+<p>能生成答案只是第一步。</p>
+<p>更重要的是:</p>
+<ul>
+<li>这个答案有没有证据</li>
+<li>tool call 是否真的成功</li>
+<li>文件是否真的被修改</li>
+<li>测试是否真的通过</li>
+<li>结论是否来自当前上下文，而不是模型记忆</li>
+</ul>
+<h2 id="0x09-xiao-jie">0x09 小结</h2>
+<p>学习 Agent 时重新看 OS，会发现很多问题并没有消失，只是换了皮肤。</p>
+<p>过去我们问:</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="plain"><span class="giallo-l"><span>process 如何隔离?</span></span>
+<span class="giallo-l"><span>thread 如何同步?</span></span>
+<span class="giallo-l"><span>syscall 如何授权?</span></span>
+<span class="giallo-l"><span>cache 如何命中?</span></span>
+<span class="giallo-l"><span>memory 如何换页?</span></span>
+<span class="giallo-l"><span>scheduler 如何公平?</span></span></code></pre>
+<p>今天我们问:</p>
+<pre class="giallo" style="color: #CDD6F4; background-color: #1E1E2E;"><code data-lang="plain"><span class="giallo-l"><span>Agent 如何隔离?</span></span>
+<span class="giallo-l"><span>sub-Agent 如何协作?</span></span>
+<span class="giallo-l"><span>tool use 如何授权?</span></span>
+<span class="giallo-l"><span>context 如何管理?</span></span>
+<span class="giallo-l"><span>RAG 如何取回正确知识?</span></span>
+<span class="giallo-l"><span>orchestrator 如何调度?</span></span></code></pre>
+<p>资源从 CPU / memory 变成了 token / inference time。</p>
+<p>程序从 machine instruction 变成了 natural language。</p>
+<p>系统调用从 syscall 变成了 function calling。</p>
+<p>文件系统从 path lookup 变成了 semantic retrieval。</p>
+<p>但底层问题还是:</p>
+<p>隔离、权限、调度、记忆、一致性。</p>
+<p>操作系统花了几十年才把这些问题想清楚。</p>
+<p>Agent 时代正在把同样的问题重新答一遍。</p>
+<p>历史不会重复，但真的会押韵。</p>
+
+      </div>
+    </div>
+  </article>
+
+
+      </main>
+
+      <footer class="site-footer">
+        <p>Built with Zola</p>
+      </footer>
+    </div>
+
+    
+
+  
+  
+    <aside class="page-sidebar article-toc" aria-label="文章目录">
+      <nav class="article-toc-nav">
+        <ul class="article-toc-list">
+          
+            <li class="article-toc-item">
+              <a class="article-toc-link" href="#0x01-process-thread-agent-sub-agent">
+                <span class="article-toc-link-text">0x01 Process &#x2F; Thread -&gt; Agent &#x2F; sub-Agent</span>
+                
+              </a>
+              
+            </li>
+          
+            <li class="article-toc-item">
+              <a class="article-toc-link" href="#0x02-system-call-tool-use">
+                <span class="article-toc-link-text">0x02 System Call -&gt; Tool Use</span>
+                
+              </a>
+              
+            </li>
+          
+            <li class="article-toc-item">
+              <a class="article-toc-link" href="#0x03-cache-virtual-memory-context-window">
+                <span class="article-toc-link-text">0x03 Cache &#x2F; Virtual Memory -&gt; Context Window</span>
+                
+              </a>
+              
+            </li>
+          
+            <li class="article-toc-item">
+              <a class="article-toc-link" href="#0x04-file-system-mount-rag">
+                <span class="article-toc-link-text">0x04 File System Mount -&gt; RAG</span>
+                
+              </a>
+              
+            </li>
+          
+            <li class="article-toc-item">
+              <a class="article-toc-link" href="#0x05-kernel-scheduler-harness-orchestrator">
+                <span class="article-toc-link-text">0x05 Kernel &#x2F; Scheduler -&gt; Harness &#x2F; Orchestrator</span>
+                
+              </a>
+              
+            </li>
+          
+            <li class="article-toc-item">
+              <a class="article-toc-link" href="#0x06-xiang-tong-dian-du-shi-zai-you-xian-zi-yuan-shang-gou-zao-zhi-xu">
+                <span class="article-toc-link-text">0x06 相同点: 都是在有限资源上构造秩序</span>
+                
+              </a>
+              
+            </li>
+          
+            <li class="article-toc-item">
+              <a class="article-toc-link" href="#0x07-bu-tong-dian-agent-de-zhuang-tai-shi-yu-yi-de">
+                <span class="article-toc-link-text">0x07 不同点: Agent 的状态是语义的</span>
+                
+              </a>
+              
+            </li>
+          
+            <li class="article-toc-item">
+              <a class="article-toc-link" href="#0x08-bu-tong-dian-os-de-cheng-xu-bei-zhi-xing-agent-de-cheng-xu-zai-sheng-cheng">
+                <span class="article-toc-link-text">0x08 不同点: OS 的程序被执行，Agent 的程序在生成</span>
+                
+              </a>
+              
+            </li>
+          
+            <li class="article-toc-item">
+              <a class="article-toc-link" href="#0x09-xiao-jie">
+                <span class="article-toc-link-text">0x09 小结</span>
+                
+              </a>
+              
+            </li>
+          
+        </ul>
+      </nav>
+    </aside>
+    <div class="mobile-toc-backdrop" id="mobile-toc-backdrop" hidden></div>
+    <div class="mobile-toc-panel" id="mobile-toc-panel" hidden aria-label="移动端文章目录">
+      <div class="mobile-toc-sheet">
+        <p class="mobile-toc-title">文章目录</p>
+        <nav class="article-toc-nav">
+          <ul class="article-toc-list">
+            
+              <li class="article-toc-item">
+                <a class="article-toc-link" href="#0x01-process-thread-agent-sub-agent">
+                  <span class="article-toc-link-text">0x01 Process &#x2F; Thread -&gt; Agent &#x2F; sub-Agent</span>
+                  
+                </a>
+                
+              </li>
+            
+              <li class="article-toc-item">
+                <a class="article-toc-link" href="#0x02-system-call-tool-use">
+                  <span class="article-toc-link-text">0x02 System Call -&gt; Tool Use</span>
+                  
+                </a>
+                
+              </li>
+            
+              <li class="article-toc-item">
+                <a class="article-toc-link" href="#0x03-cache-virtual-memory-context-window">
+                  <span class="article-toc-link-text">0x03 Cache &#x2F; Virtual Memory -&gt; Context Window</span>
+                  
+                </a>
+                
+              </li>
+            
+              <li class="article-toc-item">
+                <a class="article-toc-link" href="#0x04-file-system-mount-rag">
+                  <span class="article-toc-link-text">0x04 File System Mount -&gt; RAG</span>
+                  
+                </a>
+                
+              </li>
+            
+              <li class="article-toc-item">
+                <a class="article-toc-link" href="#0x05-kernel-scheduler-harness-orchestrator">
+                  <span class="article-toc-link-text">0x05 Kernel &#x2F; Scheduler -&gt; Harness &#x2F; Orchestrator</span>
+                  
+                </a>
+                
+              </li>
+            
+              <li class="article-toc-item">
+                <a class="article-toc-link" href="#0x06-xiang-tong-dian-du-shi-zai-you-xian-zi-yuan-shang-gou-zao-zhi-xu">
+                  <span class="article-toc-link-text">0x06 相同点: 都是在有限资源上构造秩序</span>
+                  
+                </a>
+                
+              </li>
+            
+              <li class="article-toc-item">
+                <a class="article-toc-link" href="#0x07-bu-tong-dian-agent-de-zhuang-tai-shi-yu-yi-de">
+                  <span class="article-toc-link-text">0x07 不同点: Agent 的状态是语义的</span>
+                  
+                </a>
+                
+              </li>
+            
+              <li class="article-toc-item">
+                <a class="article-toc-link" href="#0x08-bu-tong-dian-os-de-cheng-xu-bei-zhi-xing-agent-de-cheng-xu-zai-sheng-cheng">
+                  <span class="article-toc-link-text">0x08 不同点: OS 的程序被执行，Agent 的程序在生成</span>
+                  
+                </a>
+                
+              </li>
+            
+              <li class="article-toc-item">
+                <a class="article-toc-link" href="#0x09-xiao-jie">
+                  <span class="article-toc-link-text">0x09 小结</span>
+                  
+                </a>
+                
+              </li>
+            
+          </ul>
+        </nav>
+      </div>
+    </div>
+  
+
+
+  </div>
+
+  <div class="floating-tools" id="floating-tools" aria-label="页面工具">
+    <a class="floating-tool-btn" href="https://spn21.github.io/" title="返回首页" aria-label="返回首页">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M4 11.5L12 5l8 6.5"></path>
+        <path d="M6.5 10.5V19h11v-8.5"></path>
+      </svg>
+    </a>
+    <a class="floating-tool-btn" id="back-to-top" href="#top" title="返回顶部" aria-label="返回顶部">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M7 16l5-5 5 5"></path>
+        <path d="M7 11l5-5 5 5"></path>
+      </svg>
+    </a>
+    <button class="floating-tool-btn" id="toc-toggle" type="button" title="显示目录列表" aria-label="显示目录列表" aria-expanded="false" hidden>≡</button>
+  </div>
+
+  <svg class="liquid-filters" aria-hidden="true" focusable="false">
+    <filter id="liquid-glass-panel" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.012" numOctaves="2" seed="19" result="noise"></feTurbulence>
+      <feGaussianBlur in="noise" stdDeviation="0.75" result="blurred-noise"></feGaussianBlur>
+      <feDisplacementMap in="SourceGraphic" in2="blurred-noise" scale="18" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+    </filter>
+    <filter id="liquid-glass-orb" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.02 0.02" numOctaves="2" seed="29" result="noise"></feTurbulence>
+      <feGaussianBlur in="noise" stdDeviation="0.85" result="blurred-noise"></feGaussianBlur>
+      <feDisplacementMap in="SourceGraphic" in2="blurred-noise" scale="28" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+    </filter>
+  </svg>
+
+  <script>
+    // Floating tools functionality
+    const backTop = document.getElementById('back-to-top');
+    const tocToggle = document.getElementById('toc-toggle');
+    const mobileTocPanel = document.getElementById('mobile-toc-panel');
+    const mobileTocBackdrop = document.getElementById('mobile-toc-backdrop');
+
+    if (tocToggle && mobileTocPanel && mobileTocBackdrop) {
+      tocToggle.hidden = false;
+
+      const setMobileTocOpen = (open) => {
+        mobileTocPanel.hidden = !open;
+        mobileTocBackdrop.hidden = !open;
+        tocToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        document.body.classList.toggle('mobile-toc-open', open);
+      };
+
+      tocToggle.addEventListener('click', () => {
+        const isOpen = tocToggle.getAttribute('aria-expanded') === 'true';
+        setMobileTocOpen(!isOpen);
+      });
+
+      mobileTocBackdrop.addEventListener('click', () => {
+        setMobileTocOpen(false);
+      });
+
+      mobileTocPanel.addEventListener('click', (event) => {
+        const target = event.target;
+        if (target instanceof HTMLElement && target.closest('a')) {
+          setMobileTocOpen(false);
+        }
+      });
+
+      window.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          setMobileTocOpen(false);
+        }
+      });
+    }
+
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 200) {
+        backTop.classList.add('show');
+      } else {
+        backTop.classList.remove('show');
+      }
+    });
+    backTop.addEventListener('click', (event) => {
+      event.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>
